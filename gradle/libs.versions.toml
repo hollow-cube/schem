@@ -1,7 +1,14 @@
 metadata.format.version = "1.1"
 
 [versions]
-minestom = "e9d0098418"
+minestom = "8715f4305d"
+logback = "1.4.5" # For tests only
 
 [libraries]
 minestom = { group = "dev.hollowcube", name = "minestom-ce", version.ref = "minestom" }
+
+logback-core = { group = "ch.qos.logback", name = "logback-core", version.ref = "logback" }
+logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
+
+[bundles]
+logback = ["logback-core", "logback-classic"]
