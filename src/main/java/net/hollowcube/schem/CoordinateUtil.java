@@ -115,7 +115,8 @@ final class CoordinateUtil {
             case "north" -> "east";
             case "east" -> "south";
             case "south" -> "west";
-            default -> "north";
+            case "west" -> "north";
+            default -> in;
         };
     }
 
