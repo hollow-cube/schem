@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    compileOnlyApi(libs.minestom)
+    compileOnly(libs.minestom)
     testImplementation(libs.minestom)
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
