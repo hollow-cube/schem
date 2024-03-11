@@ -14,8 +14,11 @@ import java.nio.file.Path;
 
 public class SchematicWriter {
 
-    public static byte@NotNull [] write(@NotNull Schematic schematic) {
+    public static byte @NotNull [] write(@NotNull Schematic schematic) {
         MutableNBTCompound schematicNBT = new MutableNBTCompound();
+        schematicNBT.setInt("Version", 2);
+        schematicNBT.setInt("DataVersion", 3700);
+
         Point size = schematic.size();
         schematicNBT.setShort("Width", (short) size.x());
         schematicNBT.setShort("Height", (short) size.y());
