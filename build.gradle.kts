@@ -25,11 +25,10 @@ dependencies {
 }
 
 java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+
     withSourcesJar()
     withJavadocJar()
-
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
 }
 
 tasks.test {

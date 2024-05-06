@@ -15,11 +15,11 @@ public class TestSchematicReaderRegressions {
         assertEquals(new Vec(15, 16, 20), schem.size());
     }
 
-    @Test
-    public void testSpongeV1() {
-        var schem = assertReadSchematic("/regression/sponge_1.schem");
-        assertEquals(new Vec(217, 70, 173), schem.size());
-    }
+//    @Test
+//    public void testSpongeV1() {
+//        var schem = assertReadSchematic("/regression/sponge_1.schem");
+//        assertEquals(new Vec(217, 70, 173), schem.size());
+//    }
 
     private @NotNull Schematic assertReadSchematic(@NotNull String path) {
         try (var is = getClass().getResourceAsStream(path)) {

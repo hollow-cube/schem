@@ -1,52 +1,53 @@
 package net.hollowcube.schem;
 
+import net.kyori.adventure.nbt.BinaryTagIO;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.instance.block.Block;
 import org.jetbrains.annotations.NotNull;
-import org.jglrxavpok.hephaistos.nbt.CompressedProcesser;
-import org.jglrxavpok.hephaistos.nbt.NBTWriter;
-import org.jglrxavpok.hephaistos.nbt.mutable.MutableNBTCompound;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 public class SchematicWriter {
 
     public static byte @NotNull [] write(@NotNull Schematic schematic) {
-        MutableNBTCompound schematicNBT = new MutableNBTCompound();
-        schematicNBT.setInt("Version", 2);
-        schematicNBT.setInt("DataVersion", 3700);
+        CompoundBinaryTag.Builder schematicNBT = CompoundBinaryTag.builder();
+        schematicNBT.putInt("Version", 2);
+        schematicNBT.putInt("DataVersion", MinecraftServer.DATA_VERSION);
 
         Point size = schematic.size();
-        schematicNBT.setShort("Width", (short) size.x());
-        schematicNBT.setShort("Height", (short) size.y());
-        schematicNBT.setShort("Length", (short) size.z());
+        schematicNBT.putShort("Width", (short) size.x());
+        schematicNBT.putShort("Height", (short) size.y());
+        schematicNBT.putShort("Length", (short) size.z());
 
         Point offset = schematic.offset();
-        MutableNBTCompound schematicMetadata = new MutableNBTCompound();
-        schematicMetadata.setInt("WEOffsetX", offset.blockX());
-        schematicMetadata.setInt("WEOffsetY", offset.blockY());
-        schematicMetadata.setInt("WEOffsetZ", offset.blockZ());
+        CompoundBinaryTag.Builder schematicMetadata = CompoundBinaryTag.builder();
+        schematicMetadata.putInt("WEOffsetX", offset.blockX());
+        schematicMetadata.putInt("WEOffsetY", offset.blockY());
+        schematicMetadata.putInt("WEOffsetZ", offset.blockZ());
 
-        schematicNBT.set("Metadata", schematicMetadata.toCompound());
+        schematicNBT.put("Metadata", schematicMetadata.build());
 
-        schematicNBT.setByteArray("BlockData", schematic.blocks());
+        schematicNBT.putByteArray("BlockData", schematic.blocks());
         Block[] blocks = schematic.palette();
 
-        schematicNBT.setInt("PaletteMax", blocks.length);
+        schematicNBT.putInt("PaletteMax", blocks.length);
 
-        MutableNBTCompound palette = new MutableNBTCompound();
+        CompoundBinaryTag.Builder palette = CompoundBinaryTag.builder();
         for (int i = 0; i < blocks.length; i++) {
             if (blocks[i] == null) blocks[i] = Block.AIR;
-            palette.setInt(BlockUtil.toStateString(blocks[i]), i);
+            palette.putInt(BlockUtil.toStateString(blocks[i]), i);
         }
-        schematicNBT.set("Palette", palette.toCompound());
+        schematicNBT.put("Palette", palette.build());
 
         var out = new ByteArrayOutputStream();
-        try (NBTWriter writer = new NBTWriter(out, CompressedProcesser.GZIP)) {
-            writer.writeNamed("Schematic", schematicNBT.toCompound());
+        try {
+            BinaryTagIO.writer().writeNamed(Map.entry("Schematic", schematicNBT.build()), out, BinaryTagIO.Compression.GZIP);
         } catch (IOException e) {
             // No exceptions when writing to a byte array
             throw new RuntimeException(e);
