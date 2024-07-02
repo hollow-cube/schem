@@ -74,14 +74,7 @@ public final class SchematicReader {
         CompoundBinaryTag palette;
         byte[] blockArray;
         Integer paletteSize;
-        if (version == 1) {
-            palette = tag.getCompound("Palette");
-            Check.notNull(palette, "Missing required field 'Palette'");
-            blockArray = tag.getByteArray("BlockData");
-            Check.notNull(blockArray, "Missing required field 'BlockData'");
-            paletteSize = tag.getInt("PaletteMax");
-            Check.notNull(paletteSize, "Missing required field 'PaletteMax'");
-        } else {
+        if (version == 3) {
             var blockEntries = tag.getCompound("Blocks");
             Check.notNull(blockEntries, "Missing required field 'Blocks'");
 
@@ -90,6 +83,13 @@ public final class SchematicReader {
             blockArray = blockEntries.getByteArray("Data");
             Check.notNull(blockArray, "Missing required field 'Blocks.Data'");
             paletteSize = palette.size();
+        } else {
+            palette = tag.getCompound("Palette");
+            Check.notNull(palette, "Missing required field 'Palette'");
+            blockArray = tag.getByteArray("BlockData");
+            Check.notNull(blockArray, "Missing required field 'BlockData'");
+            paletteSize = tag.getInt("PaletteMax");
+            Check.notNull(paletteSize, "Missing required field 'PaletteMax'");
         }
 
         Block[] paletteBlocks = new Block[paletteSize];
