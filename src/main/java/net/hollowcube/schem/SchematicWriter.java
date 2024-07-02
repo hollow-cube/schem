@@ -13,9 +13,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
-public class SchematicWriter {
+public final class SchematicWriter {
 
-    public static byte @NotNull [] write(@NotNull Schematic schematic) {
+    public byte @NotNull [] write(@NotNull Schematic schematic) {
         CompoundBinaryTag.Builder schematicNBT = CompoundBinaryTag.builder();
         schematicNBT.putInt("Version", 2);
         schematicNBT.putInt("DataVersion", MinecraftServer.DATA_VERSION);
@@ -56,7 +56,7 @@ public class SchematicWriter {
         return out.toByteArray();
     }
 
-    public static void write(@NotNull Schematic schematic, @NotNull Path schemPath) throws IOException {
+    public void write(@NotNull Schematic schematic, @NotNull Path schemPath) throws IOException {
         Files.write(schemPath, write(schematic));
     }
 }
