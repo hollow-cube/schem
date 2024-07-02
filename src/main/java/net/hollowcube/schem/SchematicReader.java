@@ -1,6 +1,8 @@
 package net.hollowcube.schem;
 
 
+import net.hollowcube.schem.blockpalette.BlockPaletteParser;
+import net.hollowcube.schem.blockpalette.CommandBlockPaletteParser;
 import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.IntBinaryTag;
@@ -21,10 +23,14 @@ import java.util.Map;
 public final class SchematicReader {
     private static final BinaryTagIO.Reader NBT_READER = BinaryTagIO.unlimitedReader();
 
-    private SchematicReader() {
+    private BlockPaletteParser paletteParser = new CommandBlockPaletteParser();
+
+    public SchematicReader withBlockPaletteParser(BlockPaletteParser parser) {
+        this.paletteParser = parser;
+        return this;
     }
 
-    public static @NotNull Schematic read(@NotNull InputStream stream) {
+    public @NotNull Schematic read(@NotNull InputStream stream) {
         try {
             return read(NBT_READER.readNamed(stream, BinaryTagIO.Compression.GZIP));
         } catch (Exception e) {
@@ -32,7 +38,7 @@ public final class SchematicReader {
         }
     }
 
-    public static @NotNull Schematic read(@NotNull Path path) {
+    public @NotNull Schematic read(@NotNull Path path) {
         try {
             return read(NBT_READER.readNamed(path, BinaryTagIO.Compression.GZIP));
         } catch (Exception e) {
@@ -40,7 +46,7 @@ public final class SchematicReader {
         }
     }
 
-    public static @NotNull Schematic read(@NotNull Map.Entry<String, CompoundBinaryTag> namedTag) {
+    public @NotNull Schematic read(@NotNull Map.Entry<String, CompoundBinaryTag> namedTag) {
         try {
             // If it has a Schematic tag is sponge v2 or 3
             var schematicTag = namedTag.getValue().get("Schematic");
@@ -55,7 +61,7 @@ public final class SchematicReader {
         }
     }
 
-    private static @NotNull Schematic read(@NotNull CompoundBinaryTag tag, int version) {
+    private @NotNull Schematic read(@NotNull CompoundBinaryTag tag, int version) {
         short width = tag.getShort("Width");
         short height = tag.getShort("Height");
         short length = tag.getShort("Length");
@@ -97,7 +103,7 @@ public final class SchematicReader {
         palette.forEach((entry) -> {
             try {
                 int assigned = ((IntBinaryTag) entry.getValue()).value();
-                Block block = ArgumentBlockState.staticParse(entry.getKey());
+                Block block = paletteParser.parse(entry.getKey());
                 paletteBlocks[assigned] = block;
             } catch (ArgumentSyntaxException e) {
                 throw new SchematicReadException("Failed to parse block state: " + entry.getKey(), e);
