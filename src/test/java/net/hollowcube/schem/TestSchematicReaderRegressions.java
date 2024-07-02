@@ -24,7 +24,7 @@ public class TestSchematicReaderRegressions {
     private @NotNull Schematic assertReadSchematic(@NotNull String path) {
         try (var is = getClass().getResourceAsStream(path)) {
             assertNotNull(is, "Failed to load resource: " + path);
-            return SchematicReader.read(is);
+            return new SchematicReader().read(is);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
