@@ -120,4 +120,8 @@ final class CoordinateUtil {
         };
     }
 
+    public static String getCoordinateKey(int x, int y, int z) {
+        return x + "," + y + "," + z;
+    }
+
 }

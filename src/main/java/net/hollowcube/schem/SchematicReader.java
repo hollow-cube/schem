@@ -3,11 +3,9 @@ package net.hollowcube.schem;
 
 import net.hollowcube.schem.blockpalette.BlockPaletteParser;
 import net.hollowcube.schem.blockpalette.CommandBlockPaletteParser;
-import net.kyori.adventure.nbt.BinaryTagIO;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
-import net.kyori.adventure.nbt.IntBinaryTag;
-import net.minestom.server.command.builder.arguments.minecraft.ArgumentBlockState;
+import net.kyori.adventure.nbt.*;
 import net.minestom.server.command.builder.exception.ArgumentSyntaxException;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.utils.validate.Check;
@@ -15,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -61,6 +60,13 @@ public final class SchematicReader {
         }
     }
 
+    /**
+     * Reads a Sponge Schematic from a CompoundBinaryTag.
+     * @see <a href="https://github.com/SpongePowered/Schematic-Specification/">Sponge Schematic Specification</a>
+     *
+     * @param tag A CompoundBinaryTag containing the schematic data
+     * @param version The schematic specification version (1, 2, or 3)
+     */
     private @NotNull Schematic read(@NotNull CompoundBinaryTag tag, int version) {
         short width = tag.getShort("Width");
         short height = tag.getShort("Height");
@@ -80,6 +86,9 @@ public final class SchematicReader {
         CompoundBinaryTag palette;
         byte[] blockArray;
         Integer paletteSize;
+        Map<String, BlockEntity> blockEntitiesMap = new HashMap<>();
+
+
         if (version == 3) {
             var blockEntries = tag.getCompound("Blocks");
             Check.notNull(blockEntries, "Missing required field 'Blocks'");
@@ -89,6 +98,35 @@ public final class SchematicReader {
             blockArray = blockEntries.getByteArray("Data");
             Check.notNull(blockArray, "Missing required field 'Blocks.Data'");
             paletteSize = palette.size();
+            ListBinaryTag blockEntities = blockEntries.getList("BlockEntities");
+            Check.notNull(blockEntities, "Missing required field 'Blocks.BlockEntities'");
+            for (BinaryTag entities : blockEntities) {
+                if (entities instanceof CompoundBinaryTag entity) {
+                    BlockEntity blockEntity = BlockEntity.fromV3(entity);
+                    System.out.println(blockEntity);
+
+                    Point coordinate = blockEntity.point();
+                    blockEntitiesMap.put(CoordinateUtil.getCoordinateKey(coordinate.blockX(), coordinate.blockY(), coordinate.blockZ()), blockEntity);
+                }
+            }
+        } else if(version == 2) {
+            palette = tag.getCompound("Palette");
+            Check.notNull(palette, "Missing required field 'Palette'");
+            blockArray = tag.getByteArray("BlockData");
+            Check.notNull(blockArray, "Missing required field 'BlockData'");
+            paletteSize = tag.getInt("PaletteMax");
+            Check.notNull(paletteSize, "Missing required field 'PaletteMax'");
+            ListBinaryTag blockEntities = tag.getList("BlockEntities");
+            Check.notNull(blockEntities, "Missing required field 'BlockEntities'");
+            for (BinaryTag entity : blockEntities) {
+                if (entity instanceof CompoundBinaryTag entityCompound) {
+                    BlockEntity blockEntity = BlockEntity.fromV1(entityCompound);
+                    System.out.println(blockEntity);
+
+                    Point coordinate = blockEntity.point();
+                    blockEntitiesMap.put(CoordinateUtil.getCoordinateKey(coordinate.blockX(), coordinate.blockY(), coordinate.blockZ()), blockEntity);
+                }
+            }
         } else {
             palette = tag.getCompound("Palette");
             Check.notNull(palette, "Missing required field 'Palette'");
@@ -96,6 +134,17 @@ public final class SchematicReader {
             Check.notNull(blockArray, "Missing required field 'BlockData'");
             paletteSize = tag.getInt("PaletteMax");
             Check.notNull(paletteSize, "Missing required field 'PaletteMax'");
+            ListBinaryTag blockEntities = tag.getList("TileEntities");
+            Check.notNull(blockEntities, "Missing required field 'TileEntities'");
+            for (BinaryTag entity : blockEntities) {
+                if (entity instanceof CompoundBinaryTag entityCompound) {
+                    BlockEntity blockEntity = BlockEntity.fromV1(entityCompound);
+                    System.out.println(blockEntity);
+
+                    Point coordinate = blockEntity.point();
+                    blockEntitiesMap.put(CoordinateUtil.getCoordinateKey(coordinate.blockX(), coordinate.blockY(), coordinate.blockZ()), blockEntity);
+                }
+            }
         }
 
         Block[] paletteBlocks = new Block[paletteSize];
@@ -114,7 +163,8 @@ public final class SchematicReader {
                 new Vec(width, height, length),
                 offset,
                 paletteBlocks,
-                blockArray
+                blockArray,
+                blockEntitiesMap
         );
     }
 

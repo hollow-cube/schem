@@ -9,6 +9,7 @@ import net.minestom.server.utils.Utils;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -116,6 +117,6 @@ public class SchematicBuilder {
         var out = new byte[blockBytes.position()];
         blockBytes.flip().get(out);
 
-        return new Schematic(size, offset, palette, out);
+        return new Schematic(size, offset, palette, out, Collections.emptyMap());
     }
 }

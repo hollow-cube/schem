@@ -1,16 +1,20 @@
 package net.hollowcube.schem;
 
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.batch.BatchOption;
 import net.minestom.server.instance.batch.RelativeBlockBatch;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.instance.block.BlockHandler;
 import net.minestom.server.utils.Utils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.UnaryOperator;
@@ -23,11 +27,12 @@ public record Schematic(
         Point size,
         Point offset,
         Block[] palette,
-        byte[] blocks
+        byte[] blocks,
+        Map<String, BlockEntity> blockEntities
 ) {
     private static final System.Logger logger = System.getLogger(Schematic.class.getName());
 
-    static final Schematic EMPTY = new Schematic(Vec.ZERO, Vec.ZERO, new Block[0], new byte[0]);
+    static final Schematic EMPTY = new Schematic(Vec.ZERO, Vec.ZERO, new Block[0], new byte[0], Collections.emptyMap());
 
     public Schematic {
         palette = Arrays.copyOf(palette, palette.length);
@@ -69,6 +74,15 @@ public record Schematic(
                     if (block == null) {
                         logger.log(System.Logger.Level.WARNING, "Missing palette entry at {0}, {1}, {2}", x, y, z);
                         block = Block.AIR;
+                    }
+
+                    // If block entity is present at the current coordinate, apply its handler
+                    // and NBT data to the block.
+                    BlockEntity blockEntity = blockEntities.get(CoordinateUtil.getCoordinateKey(x, y, z));
+                    if(blockEntity != null) {
+                        BlockHandler handler = MinecraftServer.getBlockManager().getHandlerOrDummy(blockEntity.id());
+                        block = block.withHandler(handler);
+                        block = blockEntity.trimmedTag().size() > 0 ? block.withNbt(blockEntity.trimmedTag()) : block;
                     }
 
                     applicator.accept(
