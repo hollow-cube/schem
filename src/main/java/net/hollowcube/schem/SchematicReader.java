@@ -103,7 +103,6 @@ public final class SchematicReader {
             for (BinaryTag entities : blockEntities) {
                 if (entities instanceof CompoundBinaryTag entity) {
                     BlockEntity blockEntity = BlockEntity.fromV3(entity);
-                    System.out.println(blockEntity);
 
                     Point coordinate = blockEntity.point();
                     blockEntitiesMap.put(CoordinateUtil.getCoordinateKey(coordinate.blockX(), coordinate.blockY(), coordinate.blockZ()), blockEntity);
@@ -121,7 +120,6 @@ public final class SchematicReader {
             for (BinaryTag entity : blockEntities) {
                 if (entity instanceof CompoundBinaryTag entityCompound) {
                     BlockEntity blockEntity = BlockEntity.fromV1(entityCompound);
-                    System.out.println(blockEntity);
 
                     Point coordinate = blockEntity.point();
                     blockEntitiesMap.put(CoordinateUtil.getCoordinateKey(coordinate.blockX(), coordinate.blockY(), coordinate.blockZ()), blockEntity);
@@ -139,7 +137,6 @@ public final class SchematicReader {
             for (BinaryTag entity : blockEntities) {
                 if (entity instanceof CompoundBinaryTag entityCompound) {
                     BlockEntity blockEntity = BlockEntity.fromV1(entityCompound);
-                    System.out.println(blockEntity);
 
                     Point coordinate = blockEntity.point();
                     blockEntitiesMap.put(CoordinateUtil.getCoordinateKey(coordinate.blockX(), coordinate.blockY(), coordinate.blockZ()), blockEntity);
