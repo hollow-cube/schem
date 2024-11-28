@@ -1,6 +1,7 @@
 package net.hollowcube.schem;
 
 import net.minestom.server.coordinate.Point;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.batch.BatchOption;
 import net.minestom.server.instance.batch.RelativeBlockBatch;
@@ -23,15 +24,17 @@ public record Schematic(
         Point size,
         Point offset,
         Block[] palette,
-        byte[] blocks
+        byte[] blocks,
+        BlockEntity[] blockEntities
 ) {
     private static final System.Logger logger = System.getLogger(Schematic.class.getName());
 
-    static final Schematic EMPTY = new Schematic(Vec.ZERO, Vec.ZERO, new Block[0], new byte[0]);
+    static final Schematic EMPTY = new Schematic(Vec.ZERO, Vec.ZERO, new Block[0], new byte[0], new BlockEntity[0]);
 
     public Schematic {
         palette = Arrays.copyOf(palette, palette.length);
         blocks = Arrays.copyOf(blocks, blocks.length);
+        blockEntities = Arrays.copyOf(blockEntities, blockEntities.length);
     }
 
     @Override
@@ -65,10 +68,20 @@ public record Schematic(
         for (int y = 0; y < size().y(); y++) {
             for (int z = 0; z < size().z(); z++) {
                 for (int x = 0; x < size().x(); x++) {
+                    var position = new Pos(x, y, z);
+
                     var block = palette[Utils.readVarInt(blocks)];
                     if (block == null) {
                         logger.log(System.Logger.Level.WARNING, "Missing palette entry at {0}, {1}, {2}", x, y, z);
                         block = Block.AIR;
+                    }
+
+                    var blockEntity = Arrays.stream(blockEntities)
+                                    .filter((entity) -> entity.pos().equals(position))
+                                    .findFirst().orElse(null);
+
+                    if (blockEntity != null) {
+                        block = blockEntity.apply(block);
                     }
 
                     applicator.accept(
