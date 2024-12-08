@@ -1,7 +1,7 @@
 metadata.format.version = "1.1"
 
 [versions]
-minestom = "1_20_5-323c75f8a5"
+minestom = "ccea53ac44"
 logback = "1.4.5" # For tests only
 
 nexuspublish = "1.3.0"

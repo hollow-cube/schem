@@ -2,10 +2,10 @@ package net.hollowcube.schem;
 
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.hollowcube.schem.utils.Utils;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
-import net.minestom.server.utils.Utils;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
