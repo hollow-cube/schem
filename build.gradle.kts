@@ -12,7 +12,6 @@ description = "Schematic reader and writer for Minestom"
 
 repositories {
     mavenCentral()
-    maven(url = "https://jitpack.io")
 }
 
 dependencies {
