@@ -5,15 +5,13 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
-import net.minestom.server.utils.Utils;
+import net.minestom.server.network.NetworkBuffer;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-@SuppressWarnings("UnstableApiUsage")
 public class SchematicBuilder {
 
     // Point -> Block, a missing value is air
@@ -67,16 +65,8 @@ public class SchematicBuilder {
         // Write each block to the output buffer
         // Initial buffer size assumes that we have a palette less than 127
         // so each block is one byte. If the palette is larger, we will resize
-        var blockBytes = ByteBuffer.allocate(blockCount + 4);
+        NetworkBuffer blockBytes = NetworkBuffer.resizableBuffer(blockCount + 4);
         for (int i = 0; i < blockCount; i++) {
-
-            // Resize array if it is too small
-            if (blockBytes.remaining() <= 3) {
-                byte[] oldBytes = blockBytes.array();
-                blockBytes = ByteBuffer.allocate(blockBytes.capacity() * 2);
-                blockBytes.put(oldBytes);
-            }
-
             int index = i, width = size.blockX(), length = size.blockZ();
             int y = index / (width * length);
             int remainder = index - (y * width * length);
@@ -93,7 +83,7 @@ public class SchematicBuilder {
 
             if (block == null) {
                 // Block not set, write an air value
-                Utils.writeVarInt(blockBytes, 0);
+                NetworkBuffer.VAR_INT.write(blockBytes, 0);
                 continue;
             }
 
@@ -105,7 +95,7 @@ public class SchematicBuilder {
                 blockId = paletteMap.getInt(block);
             }
 
-            Utils.writeVarInt(blockBytes, blockId);
+            NetworkBuffer.VAR_INT.write(blockBytes, blockId);
         }
 
         var palette = new Block[paletteMap.size()];
@@ -113,8 +103,7 @@ public class SchematicBuilder {
             palette[entry.getIntValue()] = entry.getKey();
         }
 
-        var out = new byte[blockBytes.position()];
-        blockBytes.flip().get(out);
+        byte[] out = blockBytes.extractBytes(ignored -> {});
 
         return new Schematic(size, offset, palette, out);
     }

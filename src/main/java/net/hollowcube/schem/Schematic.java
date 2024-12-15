@@ -5,11 +5,10 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.batch.BatchOption;
 import net.minestom.server.instance.batch.RelativeBlockBatch;
 import net.minestom.server.instance.block.Block;
-import net.minestom.server.utils.Utils;
+import net.minestom.server.network.NetworkBuffer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -18,7 +17,6 @@ import java.util.function.UnaryOperator;
 /**
  * Represents a schematic file which can be manipulated in the world.
  */
-@SuppressWarnings("UnstableApiUsage")
 public record Schematic(
         Point size,
         Point offset,
@@ -61,11 +59,11 @@ public record Schematic(
      * @param applicator The function to call for each block in the schematic.
      */
     public void apply(@NotNull Rotation rotation, @NotNull BiConsumer<Point, Block> applicator) {
-        var blocks = ByteBuffer.wrap(this.blocks);
+        var blocks = NetworkBuffer.wrap(this.blocks, 0, 0);
         for (int y = 0; y < size().y(); y++) {
             for (int z = 0; z < size().z(); z++) {
                 for (int x = 0; x < size().x(); x++) {
-                    var block = palette[Utils.readVarInt(blocks)];
+                    var block = palette[NetworkBuffer.VAR_INT.read(blocks)];
                     if (block == null) {
                         logger.log(System.Logger.Level.WARNING, "Missing palette entry at {0}, {1}, {2}", x, y, z);
                         block = Block.AIR;
