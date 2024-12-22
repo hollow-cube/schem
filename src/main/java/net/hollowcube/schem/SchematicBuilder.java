@@ -5,7 +5,6 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
-import net.minestom.server.utils.Utils;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
@@ -13,7 +12,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-@SuppressWarnings("UnstableApiUsage")
 public class SchematicBuilder {
 
     // Point -> Block, a missing value is air

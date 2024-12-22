@@ -5,7 +5,6 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.batch.BatchOption;
 import net.minestom.server.instance.batch.RelativeBlockBatch;
 import net.minestom.server.instance.block.Block;
-import net.minestom.server.utils.Utils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +17,6 @@ import java.util.function.UnaryOperator;
 /**
  * Represents a schematic file which can be manipulated in the world.
  */
-@SuppressWarnings("UnstableApiUsage")
 public record Schematic(
         Point size,
         Point offset,
