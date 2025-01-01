@@ -1,44 +1,54 @@
-package net.hollowcube.schem;
+package net.hollowcube.schem.builder;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.hollowcube.schem.BlockEntityData;
+import net.hollowcube.schem.Schematic;
+import net.hollowcube.schem.SpongeSchematic;
+import net.hollowcube.schem.old.CoordinateUtil;
+import net.kyori.adventure.nbt.BinaryTag;
+import net.kyori.adventure.nbt.ByteArrayBinaryTag;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SchematicBuilder {
+import static net.hollowcube.schem.old.CoordinateUtil.blockIndex;
 
+public class UnboundedSchematicBuilder implements SchematicBuilder {
     // Point -> Block, a missing value is air
     private final Map<Point, Block> blockSet = new ConcurrentHashMap<>();
+    private final CompoundBinaryTag.Builder metadata = CompoundBinaryTag.builder();
 
     private Point offset = Vec.ZERO;
 
-    public void addBlock(double x, double y, double z, @NotNull Block block) {
-        addBlock(new Vec(x, y, z), block);
+    @Override
+    public void metadata(@NotNull String key, @NotNull BinaryTag value) {
+        metadata.put(key, value);
     }
 
-    public void addBlock(@NotNull Point point, @NotNull Block block) {
-        var pos = CoordinateUtil.floor(point);
-        blockSet.put(pos, Objects.requireNonNull(block));
+    @Override
+    public void block(@NotNull Point point, @NotNull Block block) {
+        blockSet.put(CoordinateUtil.floor(point), Objects.requireNonNull(block));
     }
 
-    public void setOffset(double x, double y, double z) {
-        setOffset(new Vec(x, y, z));
-    }
-
-    public void setOffset(@NotNull Point point) {
+    @Override
+    public void offset(@NotNull Point point) {
         this.offset = point;
     }
 
+    @Override
     public @NotNull Schematic build() {
         if (blockSet.isEmpty()) {
-            return Schematic.EMPTY;
+            return Schematic.empty();
         }
 
         Point min = blockSet.keySet().stream().findFirst().get();
@@ -61,6 +71,8 @@ public class SchematicBuilder {
         if (blockSet.containsValue(Block.AIR)) {
             paletteMap.put(Block.AIR, 0);
         }
+
+        var blockEntities = new Int2ObjectArrayMap<BlockEntityData>();
 
         // Write each block to the output buffer
         // Initial buffer size assumes that we have a palette less than 127
@@ -91,10 +103,11 @@ public class SchematicBuilder {
 
             if (block == null) {
                 // Block not set, write an air value
-                Utils.writeVarInt(blockBytes, 0);
+                writeVarInt(blockBytes, 0);
                 continue;
             }
 
+            // Write block palette index
             int blockId;
             if (!paletteMap.containsKey(block)) {
                 blockId = paletteMap.size();
@@ -102,8 +115,15 @@ public class SchematicBuilder {
             } else {
                 blockId = paletteMap.getInt(block);
             }
+            writeVarInt(blockBytes, blockId);
 
-            Utils.writeVarInt(blockBytes, blockId);
+            // Write block entity
+            var blockHandler = block.handler();
+            if (blockHandler != null) {
+                var blockEntityId = blockHandler.getNamespaceId().asString();
+                var blockEntityData = Objects.requireNonNullElse(block.nbt(), CompoundBinaryTag.empty());
+                blockEntities.put(blockIndex(size, x, y, z), new BlockEntityData(blockEntityId, new Vec(x, y, z), blockEntityData));
+            }
         }
 
         var palette = new Block[paletteMap.size()];
@@ -114,6 +134,30 @@ public class SchematicBuilder {
         var out = new byte[blockBytes.position()];
         blockBytes.flip().get(out);
 
-        return new Schematic(size, offset, palette, out);
+        return new SpongeSchematic(
+                metadata.build(), size, offset,
+                List.of(palette), ByteArrayBinaryTag.byteArrayBinaryTag(out),
+                List.of(), SpongeSchematic.EMPTY_BYTE_ARRAY,
+                blockEntities, List.of()
+        );
+    }
+
+    private static void writeVarInt(ByteBuffer buf, int value) {
+        if ((value & (0xFFFFFFFF << 7)) == 0) {
+            buf.put((byte) value);
+        } else if ((value & (0xFFFFFFFF << 14)) == 0) {
+            buf.putShort((short) ((value & 0x7F | 0x80) << 8 | (value >>> 7)));
+        } else if ((value & (0xFFFFFFFF << 21)) == 0) {
+            buf.put((byte) (value & 0x7F | 0x80));
+            buf.put((byte) ((value >>> 7) & 0x7F | 0x80));
+            buf.put((byte) (value >>> 14));
+        } else if ((value & (0xFFFFFFFF << 28)) == 0) {
+            buf.putInt((value & 0x7F | 0x80) << 24 | (((value >>> 7) & 0x7F | 0x80) << 16)
+                    | ((value >>> 14) & 0x7F | 0x80) << 8 | (value >>> 21));
+        } else {
+            buf.putInt((value & 0x7F | 0x80) << 24 | ((value >>> 7) & 0x7F | 0x80) << 16
+                    | ((value >>> 14) & 0x7F | 0x80) << 8 | ((value >>> 21) & 0x7F | 0x80));
+            buf.put((byte) (value >>> 28));
+        }
     }
 }

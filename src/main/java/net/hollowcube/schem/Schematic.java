@@ -1,5 +1,8 @@
 package net.hollowcube.schem;
 
+import net.hollowcube.schem.util.BlockConsumer;
+import net.kyori.adventure.nbt.ByteArrayBinaryTag;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.batch.BatchOption;
@@ -8,122 +11,129 @@ import net.minestom.server.instance.block.Block;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.function.BiConsumer;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
 import java.util.function.UnaryOperator;
 
 /**
- * Represents a schematic file which can be manipulated in the world.
+ * <p>An publicly-immutable copy of any loaded schematic. This interface defines the basic requirements for any schematic, however
+ * this may not be a complete representation of the internal details of a schematic. For example, {@link Structure}
+ * supports multiple palettes, however this information is lost in the generic Schematic api (the first palette is used).</p>
+ *
+ * <p>Any schematic may be written to any {@link net.hollowcube.schem.writer.SchematicWriter}, no matter the type. If
+ * the type does not match the writer, it will be converted as it is written (note that this conversion could be a
+ * relatively expensive process.</p>
  */
-public record Schematic(
-        Point size,
-        Point offset,
-        Block[] palette,
-        byte[] blocks
-) {
-    private static final System.Logger logger = System.getLogger(Schematic.class.getName());
+public interface Schematic {
 
-    static final Schematic EMPTY = new Schematic(Vec.ZERO, Vec.ZERO, new Block[0], new byte[0]);
-
-    public Schematic {
-        palette = Arrays.copyOf(palette, palette.length);
-        blocks = Arrays.copyOf(blocks, blocks.length);
+    static @NotNull Schematic empty() {
+        return SpongeSchematic.EMPTY;
     }
 
-    @Override
-    public Block @NotNull [] palette() {
-        return Arrays.copyOf(palette, palette.length);
-    }
-
-    @Override
-    public byte @NotNull [] blocks() {
-        return Arrays.copyOf(blocks, blocks.length);
-    }
-
-    public @NotNull Point size(@NotNull Rotation rotation) {
-        return CoordinateUtil.abs(CoordinateUtil.rotatePos(size, rotation));
-    }
-
-    public @NotNull Point offset(@NotNull Rotation rotation) {
-        return CoordinateUtil.rotatePos(offset, rotation);
+    default @NotNull CompoundBinaryTag metadata() {
+        return CompoundBinaryTag.empty();
     }
 
     /**
-     * Apply the schematic directly given a rotation. The applicator function will be called for each block in the schematic.
-     * <p>
-     * Note: The {@link Point} passed to `applicator` is relative to the {@link #offset()}.
-     *
-     * @param rotation   The rotation to apply before placement.
-     * @param applicator The function to call for each block in the schematic.
+     * Returns the name of the schematic, if available.
      */
-    public void apply(@NotNull Rotation rotation, @NotNull BiConsumer<Point, Block> applicator) {
-        var blocks = ByteBuffer.wrap(this.blocks);
-        for (int y = 0; y < size().y(); y++) {
-            for (int z = 0; z < size().z(); z++) {
-                for (int x = 0; x < size().x(); x++) {
-                    var block = palette[Utils.readVarInt(blocks)];
-                    if (block == null) {
-                        logger.log(System.Logger.Level.WARNING, "Missing palette entry at {0}, {1}, {2}", x, y, z);
-                        block = Block.AIR;
-                    }
-
-                    applicator.accept(
-                            CoordinateUtil.rotatePos(offset.add(x, y, z), rotation),
-                            CoordinateUtil.rotateBlock(block, rotation));
-                }
-            }
-        }
+    default @Nullable String name() {
+        return null;
     }
-
     /**
-     * Convert the schematic into a {@link RelativeBlockBatch} which can be applied to an instance.
-     * The schematic can be rotated around its {@link #offset()} before placement.
-     *
-     * @param rotation      The rotation to apply to the schematic.
-     * @param blockModifier If present, called on each individual block before it is placed.
-     * @return A {@link RelativeBlockBatch} which represents the schematic file at its offset.
+     * Returns the author of the schematic, if available.
      */
-    public @NotNull RelativeBlockBatch build(@NotNull Rotation rotation, @Nullable UnaryOperator<Block> blockModifier) {
-        RelativeBlockBatch batch = new RelativeBlockBatch(new BatchOption().setCalculateInverse(true));
-        apply(rotation, (pos, block) -> batch.setBlock(pos, blockModifier == null ? block : blockModifier.apply(block)));
-        return batch;
+    default @Nullable String author() {
+        return null;
+    }
+    /**
+     * Returns the creation time of the schematic, if available.
+     */
+    default @Nullable Instant createdAt() {
+        return null;
     }
 
-    public @NotNull RelativeBlockBatch build(@NotNull Rotation rotation, boolean skipAir) {
+    @NotNull Point size();
+    default @NotNull Point offset() {
+        return Vec.ZERO;
+    }
+
+    // Application functions
+
+    default void forEachBlock(@NotNull BlockConsumer consumer) {
+        forEachBlock(Rotation.NONE, consumer);
+    }
+
+    void forEachBlock(@NotNull Rotation rotation, @NotNull BlockConsumer consumer);
+
+    default @NotNull RelativeBlockBatch createBatch() {
+        return createBatch(Rotation.NONE, null);
+    }
+    default @NotNull RelativeBlockBatch createBatch(@NotNull UnaryOperator<@Nullable Block> blockTransformer) {
+        return createBatch(Rotation.NONE, blockTransformer);
+    }
+    default @NotNull RelativeBlockBatch createBatch(@NotNull Rotation rotation) {
+        return createBatch(rotation, null);
+    }
+    default @NotNull RelativeBlockBatch createBatch(@NotNull Rotation rotation, @Nullable UnaryOperator<@Nullable Block> blockTransformer) {
         RelativeBlockBatch batch = new RelativeBlockBatch(new BatchOption().setCalculateInverse(true));
-        apply(rotation, (pos, block) -> {
-            if (block.isAir() && skipAir) return;
-            batch.setBlock(pos, block);
+        forEachBlock(rotation, (pos, block) -> {
+            var resultBlock = blockTransformer == null ? block : blockTransformer.apply(block);
+            if (resultBlock != null) batch.setBlock(pos, resultBlock);
         });
         return batch;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Schematic schematic = (Schematic) o;
-        return size.equals(schematic.size) &&
-                offset.equals(schematic.offset) &&
-                Arrays.equals(palette, schematic.palette) &&
-                Arrays.equals(blocks, schematic.blocks);
+    // Raw data access below
+    // Generally intended for serialization, care should be used when calling.
+
+    /**
+     * Returns true if the schematic has block data (including block entities), false otherwise.
+     */
+    default boolean hasBlockData() {
+        return false;
+    }
+    /**
+     * Returns the block palette for the entire schematic, zero indexed with no empty spaces.
+     *
+     * <p>Note: the value may be computed when called so may be uncached and expensive. It is
+     * wise to cache the result if this will be called many times, although this is largely an
+     * internal api used for serialization.</p>
+     *
+     * @return The (computed) block palette for the schematic
+     */
+    default @NotNull List<Block> blockPalette() {
+        return List.of();
+    }
+    /**
+     * Returns the block data for the entire schematic. The format is (size.x * size.y * size.z) var ints
+     * in a row, each corresponding to an entry in {@link #blockPalette()}.
+     *
+     * <p>Note: the value may be computed when called so may be uncached and expensive. It is
+     * wise to cache the result if this will be called many times, although this is largely an
+     * internal api used for serialization.</p>
+     *
+     * @return The (computed) block palette for the schematic
+     */
+    default @NotNull ByteArrayBinaryTag blockData() {
+        return SpongeSchematic.EMPTY_BYTE_ARRAY;
+    }
+    default @NotNull Collection<BlockEntityData> blockEntities() {
+        return List.of();
     }
 
-    @Override
-    public int hashCode() {
-        int result = Objects.hash(size, offset);
-        result = 31 * result + Arrays.hashCode(palette);
-        result = 31 * result + Arrays.hashCode(blocks);
-        return result;
+    default boolean hasBiomeData() {
+        return false;
+    }
+    default @NotNull List<String> biomePalette() {
+        return List.of();
+    }
+    default @NotNull ByteArrayBinaryTag biomeData() {
+        return SpongeSchematic.EMPTY_BYTE_ARRAY;
     }
 
-    @Override
-    public String toString() {
-        return String.format(
-                "Schematic[size=%s, offset=%s, palette=%s, blocks=%s]",
-                size, offset, Arrays.toString(palette), Arrays.toString(blocks)
-        );
+    default @NotNull List<CompoundBinaryTag> entities() {
+        return List.of();
     }
 }

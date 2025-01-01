@@ -1,5 +1,6 @@
-package net.hollowcube.schem;
+package net.hollowcube.schem.old;
 
+import net.hollowcube.schem.Rotation;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
@@ -7,8 +8,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-final class CoordinateUtil {
+public final class CoordinateUtil {
     private CoordinateUtil() {
+    }
+
+    public static int blockIndex(@NotNull Point size, @NotNull Point pos) {
+        return blockIndex(size, pos.blockX(), pos.blockY(), pos.blockZ());
+    }
+
+    public static int blockIndex(@NotNull Point size, int x, int y, int z) {
+        return (int) (x + z * size.x() + y * size.x() * size.z());
     }
 
     public static @NotNull Point floor(@NotNull Point point) {
