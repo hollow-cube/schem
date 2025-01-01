@@ -1,3 +1,6 @@
+> [!WARNING]
+> This branch is a heavy work in progress, expect things to change in the future before it is merged.
+
 # Schem
 
 [![license](https://img.shields.io/github/license/Minestom/MinestomDataGenerator.svg)](LICENSE)
