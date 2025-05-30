@@ -1,6 +1,7 @@
 package net.hollowcube.schem;
 
 import net.hollowcube.schem.util.BlockConsumer;
+import net.hollowcube.schem.util.BlockTransformer;
 import net.kyori.adventure.nbt.ByteArrayBinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.coordinate.Point;
@@ -14,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.UnaryOperator;
 
 /**
  * <p>An publicly-immutable copy of any loaded schematic. This interface defines the basic requirements for any schematic, however
@@ -70,16 +70,16 @@ public interface Schematic {
     default @NotNull RelativeBlockBatch createBatch() {
         return createBatch(Rotation.NONE, null);
     }
-    default @NotNull RelativeBlockBatch createBatch(@NotNull UnaryOperator<@Nullable Block> blockTransformer) {
+    default @NotNull RelativeBlockBatch createBatch(@NotNull BlockTransformer blockTransformer) {
         return createBatch(Rotation.NONE, blockTransformer);
     }
     default @NotNull RelativeBlockBatch createBatch(@NotNull Rotation rotation) {
         return createBatch(rotation, null);
     }
-    default @NotNull RelativeBlockBatch createBatch(@NotNull Rotation rotation, @Nullable UnaryOperator<@Nullable Block> blockTransformer) {
+    default @NotNull RelativeBlockBatch createBatch(@NotNull Rotation rotation, @Nullable BlockTransformer blockTransformer) {
         RelativeBlockBatch batch = new RelativeBlockBatch(new BatchOption().setCalculateInverse(true));
         forEachBlock(rotation, (pos, block) -> {
-            var resultBlock = blockTransformer == null ? block : blockTransformer.apply(block);
+            var resultBlock = blockTransformer == null ? block : blockTransformer.transform(pos, block);
             if (resultBlock != null) batch.setBlock(pos, resultBlock);
         });
         return batch;
