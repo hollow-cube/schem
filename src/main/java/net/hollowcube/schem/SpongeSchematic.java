@@ -32,7 +32,6 @@ public record SpongeSchematic(
         @NotNull Int2ObjectMap<BlockEntityData> blockEntitiesByPos,
         @NotNull List<CompoundBinaryTag> entities
 ) implements Schematic {
-    private static final BlockManager BLOCK_MANAGER = MinecraftServer.getBlockManager();
 
     public static final ByteArrayBinaryTag EMPTY_BYTE_ARRAY = ByteArrayBinaryTag.byteArrayBinaryTag();
     public static final Schematic EMPTY = new SpongeSchematic(
@@ -51,6 +50,7 @@ public record SpongeSchematic(
 
     @Override
     public void forEachBlock(@NotNull Rotation rotation, @NotNull BlockConsumer consumer) {
+        final BlockManager BLOCK_MANAGER = MinecraftServer.getBlockManager();
         var reader = new VarIntReader(this.blockData);
         for (int y = 0; y < size().y(); y++) {
             for (int z = 0; z < size().z(); z++) {
