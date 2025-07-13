@@ -56,5 +56,5 @@ public class DetectingSchematicReader implements SchematicReader {
             default -> throw new UnknownSchematicTypeException();
         };
     }
-    
+
 }
