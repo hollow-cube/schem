@@ -3,7 +3,7 @@ plugins {
 
     `maven-publish`
     signing
-    alias(libs.plugins.nexuspublish)
+    alias(libs.plugins.nmcp)
 }
 
 group = "dev.hollowcube"
@@ -19,8 +19,8 @@ dependencies {
     compileOnly(libs.minestom)
     testImplementation(libs.minestom)
 
-    testImplementation(platform("org.junit:junit-bom:5.9.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.bundles.logback)
 }
 
@@ -35,18 +35,14 @@ tasks.test {
     useJUnitPlatform()
 }
 
-nexusPublishing {
-    this.packageGroup.set("dev.hollowcube")
-
-    repositories.sonatype {
-        nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-        snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-
-        if (System.getenv("SONATYPE_USERNAME") != null) {
-            username.set(System.getenv("SONATYPE_USERNAME"))
-            password.set(System.getenv("SONATYPE_PASSWORD"))
-        }
+nmcpAggregation {
+    centralPortal {
+        username = System.getenv("SONATYPE_USERNAME")
+        password = System.getenv("SONATYPE_PASSWORD")
+        publishingType = if ("dev" in project.version.toString()) "USER_MANAGED" else "AUTOMATIC"
     }
+
+    publishAllProjectsProbablyBreakingProjectIsolation()
 }
 
 publishing.publications.create<MavenPublication>("maven") {
