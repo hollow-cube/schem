@@ -3,6 +3,7 @@ package net.hollowcube.schem.reader;
 import net.hollowcube.schem.BlockEntityData;
 import net.hollowcube.schem.Schematic;
 import net.hollowcube.schem.Structure;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
@@ -74,7 +75,7 @@ public class StructureReader implements SchematicReader {
             BlockEntityData blockEntity = null;
             if (blockCompound.get("nbt") instanceof CompoundBinaryTag nbt) {
                 var id = getRequired(nbt, "id", BinaryTagTypes.STRING).value();
-                blockEntity = new BlockEntityData(id, pos, nbt.remove("id"));
+                blockEntity = new BlockEntityData(Key.key(id), pos, nbt.remove("id"));
             }
 
             blocks.add(new Structure.BlockInfo(pos, state, blockEntity));

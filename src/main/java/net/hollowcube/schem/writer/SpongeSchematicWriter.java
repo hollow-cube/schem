@@ -77,7 +77,7 @@ public class SpongeSchematicWriter implements SchematicWriter {
         for (var blockEntity : schematic.blockEntities()) {
             var pos = blockEntity.position();
             blockEntityList.add(CompoundBinaryTag.builder()
-                    .putString("Id", blockEntity.id())
+                    .putString("Id", blockEntity.key().value())
                     .putIntArray("Pos", new int[]{pos.blockX(), pos.blockY(), pos.blockZ()})
                     .put("Data", blockEntity.data())
                     .build());

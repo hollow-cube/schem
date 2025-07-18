@@ -5,6 +5,7 @@ import net.hollowcube.schem.BlockEntityData;
 import net.hollowcube.schem.Schematic;
 import net.hollowcube.schem.SpongeSchematic;
 import net.hollowcube.schem.util.GameDataProvider;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.*;
 import net.minestom.server.command.builder.arguments.minecraft.ArgumentBlockState;
 import net.minestom.server.command.builder.exception.ArgumentSyntaxException;
@@ -128,8 +129,8 @@ public class SpongeSchematicReader implements SchematicReader {
 
                 var blockEntityData = extracted.build();
                 if (dataVersion < dataVersionMax)
-                    blockEntityData = gameData.upgradeBlockEntity(dataVersion, dataVersionMax, id.value(), blockEntityData);
-                blockEntities.put(blockIndex(size, pos), new BlockEntityData(id.value(), pos, blockEntityData));
+                    blockEntityData = gameData.upgradeBlockEntity(dataVersion, dataVersionMax, Key.key(id.value()), blockEntityData);
+                blockEntities.put(blockIndex(size, pos), new BlockEntityData(Key.key(id.value()), pos, blockEntityData));
             }
         } else {
             var blocksContainer = root.getCompound("Blocks");
@@ -161,8 +162,8 @@ public class SpongeSchematicReader implements SchematicReader {
                 var pos = getRequiredPoint(blockEntity, "Pos");
                 var data = blockEntity.getCompound("Data");
                 if (dataVersion < gameData.dataVersion())
-                    data = gameData.upgradeBlockEntity(dataVersion, gameData.dataVersion(), id.value(), data);
-                blockEntities.put(blockIndex(size, pos), new BlockEntityData(id.value(), pos, data));
+                    data = gameData.upgradeBlockEntity(dataVersion, gameData.dataVersion(), Key.key(id.value()), data);
+                blockEntities.put(blockIndex(size, pos), new BlockEntityData(Key.key(id.value()), pos, data));
             }
         }
 

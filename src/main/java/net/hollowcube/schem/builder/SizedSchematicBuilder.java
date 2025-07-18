@@ -13,6 +13,7 @@ import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.instance.block.BlockHandler;
 import net.minestom.server.network.NetworkBuffer;
 import org.jetbrains.annotations.NotNull;
 
@@ -61,7 +62,7 @@ final class SizedSchematicBuilder implements SchematicBuilder {
 
         var blockHandler = block.handler();
         if (blockHandler != null) {
-            var blockEntityId = blockHandler.getNamespaceId().asString();
+            var blockEntityId = blockHandler.getKey();
             var blockEntityData = Objects.requireNonNullElse(block.nbt(), CompoundBinaryTag.empty());
             blockEntities.put(blockIndex, new BlockEntityData(blockEntityId, relPos, blockEntityData));
         }
