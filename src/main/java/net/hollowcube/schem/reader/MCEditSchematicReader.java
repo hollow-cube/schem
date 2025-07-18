@@ -7,6 +7,7 @@ import net.hollowcube.schem.BlockEntityData;
 import net.hollowcube.schem.Schematic;
 import net.hollowcube.schem.SpongeSchematic;
 import net.hollowcube.schem.util.GameDataProvider;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.ByteArrayBinaryTag;
@@ -96,9 +97,9 @@ public class MCEditSchematicReader implements SchematicReader {
             var id = getRequired(base, "id", BinaryTagTypes.STRING).value();
             var pos = getRequiredVec3(base, "");
             var data = base.remove("id").remove("x").remove("y").remove("z");
-            blockEntities.put(blockIndex(size, pos), new BlockEntityData(id, pos,
+            blockEntities.put(blockIndex(size, pos), new BlockEntityData(Key.key(id), pos,
                     // Always try to upgrade since this is always a legacy format
-                    gameData.upgradeBlockEntity(GameDataProvider.DATA_VERSION_UNKNOWN, gameData.dataVersion(), id, data)));
+                    gameData.upgradeBlockEntity(GameDataProvider.DATA_VERSION_UNKNOWN, gameData.dataVersion(), Key.key(id), data)));
         }
 
         // === Entities ===

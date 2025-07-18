@@ -58,7 +58,7 @@ public record SpongeSchematic(
                     var block = blockPalette.get(reader.next());
                     var blockEntity = blockEntitiesByPos.get(blockIndex(size, x, y, z));
                     if (blockEntity != null) {
-                        block = block.withHandler(BLOCK_MANAGER.getHandlerOrDummy(blockEntity.id()))
+                        block = block.withHandler(BLOCK_MANAGER.getHandlerOrDummy(blockEntity.key().namespace()))
                                 .withNbt(blockEntity.data());
                     }
 
