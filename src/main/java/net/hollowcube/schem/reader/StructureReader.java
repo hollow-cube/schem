@@ -8,6 +8,8 @@ import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
+import net.minestom.server.coordinate.BlockVec;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.instance.block.Block;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +32,13 @@ public class StructureReader implements SchematicReader {
         } catch (IOException e) {
             throw new SchematicReadException("failed to read root compound", e);
         }
+    }
+
+    public static @NotNull Point getRequiredPoint(@NotNull CompoundBinaryTag tag, @NotNull String key) {
+        var rawOffset = getRequired(tag, key, BinaryTagTypes.LIST);
+        assertTrue(rawOffset.size() == 3, "invalid {0} size {1}", key, rawOffset.size());
+        assertTrue(rawOffset.elementType() == BinaryTagTypes.INT, "position list must contain ints");
+        return new BlockVec(rawOffset.getInt(0), rawOffset.getInt(1), rawOffset.getInt(2));
     }
 
     public @NotNull Schematic read(@NotNull Map.Entry<String, CompoundBinaryTag> rootPair) {
