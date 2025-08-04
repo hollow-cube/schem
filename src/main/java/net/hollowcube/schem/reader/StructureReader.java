@@ -53,7 +53,7 @@ final class StructureReader implements SchematicReader {
         if (singlePalette.size() != 0) {
             var palette = new Block[singlePalette.size()];
             for (int i = 0; i < singlePalette.size(); i++)
-                palette[i++] = readBlockState(singlePalette.getCompound(i));
+                palette[i] = readBlockState(singlePalette.getCompound(i));
             palettes.add(palette);
             paletteSize = palette.length;
         } else {
@@ -62,7 +62,7 @@ final class StructureReader implements SchematicReader {
                 var innerPalette = (ListBinaryTag) innerPaletteRaw;
                 var palette = new Block[innerPalette.size()];
                 for (int i = 0; i < innerPalette.size(); i++)
-                    palette[i++] = readBlockState(innerPalette.getCompound(i));
+                    palette[i] = readBlockState(innerPalette.getCompound(i));
                 palettes.add(palette);
 
                 if (paletteSize == -1) paletteSize = palette.length;
