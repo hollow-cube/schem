@@ -1,10 +1,13 @@
 package net.hollowcube.schem;
 
+import net.hollowcube.schem.old.CoordinateUtil;
 import net.hollowcube.schem.util.BlockConsumer;
 import net.kyori.adventure.nbt.ByteArrayBinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.instance.block.BlockManager;
 import net.minestom.server.network.NetworkBuffer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +34,18 @@ public record Structure(
 
     @Override
     public void forEachBlock(@NotNull Rotation rotation, @NotNull BlockConsumer consumer) {
-
+        final BlockManager BLOCK_MANAGER = MinecraftServer.getBlockManager();
+        for(BlockInfo blockInfo : this.blocks) {
+            Block block = this.palettes.getFirst()[blockInfo.paletteIndex];
+            if(blockInfo.blockEntity != null) {
+                block = block.withHandler(BLOCK_MANAGER.getHandlerOrDummy(blockInfo.blockEntity.key().asString()))
+                        .withNbt(blockInfo.blockEntity.data());
+            }
+            consumer.accept(
+                    CoordinateUtil.rotatePos(blockInfo.pos, rotation),
+                    CoordinateUtil.rotateBlock(block, rotation)
+            );
+        }
     }
 
     @Override
@@ -43,7 +57,7 @@ public record Structure(
     public @NotNull List<Block> blockPalette() {
         // All of this logic just ensures the palette contains air.
         int airIndex = -1;
-        var palette = palettes.get(0);
+        var palette = palettes.getFirst();
         for (int i = 0; i < palette.length; i++) {
             if (palette[i] == Block.AIR) {
                 airIndex = i;
@@ -61,7 +75,7 @@ public record Structure(
     public @NotNull ByteArrayBinaryTag blockData() {
         // Figure out the index of the air entry, or add one at the end
         int airIndex = -1;
-        var palette = palettes.get(0);
+        var palette = palettes.getFirst();
         for (int i = 0; i < palette.length; i++) {
             if (palette[i] == Block.AIR) {
                 airIndex = i;
