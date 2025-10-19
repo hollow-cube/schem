@@ -7,12 +7,10 @@ import net.hollowcube.schem.BlockEntityData;
 import net.hollowcube.schem.Schematic;
 import net.hollowcube.schem.SpongeSchematic;
 import net.hollowcube.schem.util.GameDataProvider;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.ByteArrayBinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import net.minestom.server.command.builder.arguments.minecraft.ArgumentBlockState;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.NetworkBuffer;
@@ -25,8 +23,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-import static net.hollowcube.schem.old.CoordinateUtil.blockIndex;
 import static net.hollowcube.schem.reader.ReadHelpers.*;
+import static net.hollowcube.schem.util.CoordinateUtil.blockIndex;
 
 // MCEdit/Schematica/WE pre 1.13
 @SuppressWarnings("UnstableApiUsage")
@@ -97,9 +95,9 @@ public class MCEditSchematicReader implements SchematicReader {
             var id = getRequired(base, "id", BinaryTagTypes.STRING).value();
             var pos = getRequiredVec3(base, "");
             var data = base.remove("id").remove("x").remove("y").remove("z");
-            blockEntities.put(blockIndex(size, pos), new BlockEntityData(Key.key(id), pos,
+            blockEntities.put(blockIndex(size, pos), new BlockEntityData(id, pos,
                     // Always try to upgrade since this is always a legacy format
-                    gameData.upgradeBlockEntity(GameDataProvider.DATA_VERSION_UNKNOWN, gameData.dataVersion(), Key.key(id), data)));
+                    gameData.upgradeBlockEntity(GameDataProvider.DATA_VERSION_UNKNOWN, gameData.dataVersion(), id, data)));
         }
 
         // === Entities ===
@@ -123,7 +121,7 @@ public class MCEditSchematicReader implements SchematicReader {
             Objects.requireNonNull(is, "legacy_blocks.json not found");
             var blockData = new Gson().fromJson(new InputStreamReader(is), JsonObject.class);
             for (var entry : blockData.entrySet())
-                entries.put(entry.getKey(), ArgumentBlockState.staticParse(entry.getValue().getAsString()));
+                entries.put(entry.getKey(), Block.fromState(entry.getValue().getAsString()));
         } catch (Exception e) {
             logger.error("failed to load legacy blocks (loading a legacy schematic will fail): {}", e.getMessage());
         }

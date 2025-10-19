@@ -12,12 +12,13 @@ description = "Schematic reader and writer for Minestom"
 
 repositories {
     mavenCentral()
-    maven(url = "https://jitpack.io")
 }
 
 dependencies {
     compileOnly(libs.minestom)
     testImplementation(libs.minestom)
+    compileOnly(libs.fastutil)
+    testImplementation(libs.fastutil)
 
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform.launcher)
@@ -25,7 +26,7 @@ dependencies {
 }
 
 java {
-    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
 
     withSourcesJar()
     withJavadocJar()

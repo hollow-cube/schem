@@ -7,7 +7,7 @@ import net.hollowcube.schem.BlockEntityData;
 import net.hollowcube.schem.LitematicaSchematic;
 import net.hollowcube.schem.Schematic;
 import net.hollowcube.schem.SpongeSchematic;
-import net.hollowcube.schem.old.CoordinateUtil;
+import net.hollowcube.schem.util.CoordinateUtil;
 import net.hollowcube.schem.util.GameDataProvider;
 import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.BinaryTagTypes;
@@ -26,8 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static net.hollowcube.schem.old.CoordinateUtil.blockIndex;
 import static net.hollowcube.schem.reader.ReadHelpers.*;
+import static net.hollowcube.schem.util.CoordinateUtil.blockIndex;
 
 @SuppressWarnings("UnstableApiUsage")
 public class LitematicaSchematicReader implements SchematicReader {
@@ -119,9 +119,9 @@ public class LitematicaSchematicReader implements SchematicReader {
                             index / (size.x() * size.z())
                     );
                     if (dataVersion != gameData.dataVersion()) {
-                        blockEntity = gameData.upgradeBlockEntity(dataVersion, gameData.dataVersion(), blockEntityId, blockEntity);
+                        blockEntity = gameData.upgradeBlockEntity(dataVersion, gameData.dataVersion(), blockEntityId.asString(), blockEntity);
                     }
-                    blockEntities.put(blockIndex(size, blockPosition), new BlockEntityData(blockEntityId, blockPosition, blockEntity));
+                    blockEntities.put(blockIndex(size, blockPosition), new BlockEntityData(blockEntityId.asString(), blockPosition, blockEntity));
                 }
             }
         }));

@@ -2,8 +2,9 @@ package net.hollowcube.schem;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
-import net.hollowcube.schem.old.CoordinateUtil;
 import net.hollowcube.schem.util.BlockConsumer;
+import net.hollowcube.schem.util.CoordinateUtil;
+import net.hollowcube.schem.util.Rotation;
 import net.hollowcube.schem.util.VarIntReader;
 import net.kyori.adventure.nbt.*;
 import net.minestom.server.MinecraftServer;
@@ -17,8 +18,9 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
-import static net.hollowcube.schem.old.CoordinateUtil.blockIndex;
+import static net.hollowcube.schem.util.CoordinateUtil.blockIndex;
 
 @SuppressWarnings("UnstableApiUsage")
 public record SpongeSchematic(
@@ -58,7 +60,9 @@ public record SpongeSchematic(
                     var block = blockPalette.get(reader.next());
                     var blockEntity = blockEntitiesByPos.get(blockIndex(size, x, y, z));
                     if (blockEntity != null) {
-                        block = block.withHandler(BLOCK_MANAGER.getHandlerOrDummy(blockEntity.key().namespace()))
+                        // Lower case the IDs always to prevent parse errors, especially for legacy names like 'Beacon'
+                        var lowerKey = blockEntity.id().toLowerCase(Locale.ROOT);
+                        block = block.withHandler(BLOCK_MANAGER.getHandlerOrDummy(lowerKey))
                                 .withNbt(blockEntity.data());
                     }
 

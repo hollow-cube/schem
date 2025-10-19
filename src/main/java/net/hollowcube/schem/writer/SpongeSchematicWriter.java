@@ -1,7 +1,6 @@
 package net.hollowcube.schem.writer;
 
 import net.hollowcube.schem.Schematic;
-import net.hollowcube.schem.old.BlockUtil;
 import net.hollowcube.schem.util.GameDataProvider;
 import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.BinaryTagTypes;
@@ -69,7 +68,7 @@ public class SpongeSchematicWriter implements SchematicWriter {
         var palette = schematic.blockPalette();
         var paletteTag = CompoundBinaryTag.builder();
         for (int i = 0; i < palette.size(); i++)
-            paletteTag.putInt(BlockUtil.toStateString(palette.get(i)), i);
+            paletteTag.putInt(palette.get(i).state(), i);
         container.put("Palette", paletteTag.build());
         container.put("Data", schematic.blockData());
 
@@ -77,7 +76,7 @@ public class SpongeSchematicWriter implements SchematicWriter {
         for (var blockEntity : schematic.blockEntities()) {
             var pos = blockEntity.position();
             blockEntityList.add(CompoundBinaryTag.builder()
-                    .putString("Id", blockEntity.key().value())
+                    .putString("Id", blockEntity.id())
                     .putIntArray("Pos", new int[]{pos.blockX(), pos.blockY(), pos.blockZ()})
                     .put("Data", blockEntity.data())
                     .build());

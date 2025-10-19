@@ -2,6 +2,7 @@ package net.hollowcube.schem;
 
 import net.hollowcube.schem.util.BlockConsumer;
 import net.hollowcube.schem.util.BlockTransformer;
+import net.hollowcube.schem.util.Rotation;
 import net.kyori.adventure.nbt.ByteArrayBinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.coordinate.Point;
@@ -41,12 +42,14 @@ public interface Schematic {
     default @Nullable String name() {
         return null;
     }
+
     /**
      * Returns the author of the schematic, if available.
      */
     default @Nullable String author() {
         return null;
     }
+
     /**
      * Returns the creation time of the schematic, if available.
      */
@@ -55,6 +58,7 @@ public interface Schematic {
     }
 
     @NotNull Point size();
+
     default @NotNull Point offset() {
         return Vec.ZERO;
     }
@@ -70,12 +74,15 @@ public interface Schematic {
     default @NotNull RelativeBlockBatch createBatch() {
         return createBatch(Rotation.NONE, null);
     }
+
     default @NotNull RelativeBlockBatch createBatch(@NotNull BlockTransformer blockTransformer) {
         return createBatch(Rotation.NONE, blockTransformer);
     }
+
     default @NotNull RelativeBlockBatch createBatch(@NotNull Rotation rotation) {
         return createBatch(rotation, null);
     }
+
     default @NotNull RelativeBlockBatch createBatch(@NotNull Rotation rotation, @Nullable BlockTransformer blockTransformer) {
         RelativeBlockBatch batch = new RelativeBlockBatch(new BatchOption().setCalculateInverse(true));
         forEachBlock(rotation, (pos, block) -> {
@@ -94,6 +101,7 @@ public interface Schematic {
     default boolean hasBlockData() {
         return false;
     }
+
     /**
      * Returns the block palette for the entire schematic, zero indexed with no empty spaces.
      *
@@ -106,6 +114,7 @@ public interface Schematic {
     default @NotNull List<Block> blockPalette() {
         return List.of();
     }
+
     /**
      * Returns the block data for the entire schematic. The format is (size.x * size.y * size.z) var ints
      * in a row, each corresponding to an entry in {@link #blockPalette()}.
@@ -119,6 +128,7 @@ public interface Schematic {
     default @NotNull ByteArrayBinaryTag blockData() {
         return SpongeSchematic.EMPTY_BYTE_ARRAY;
     }
+
     default @NotNull Collection<BlockEntityData> blockEntities() {
         return List.of();
     }
@@ -126,9 +136,11 @@ public interface Schematic {
     default boolean hasBiomeData() {
         return false;
     }
+
     default @NotNull List<String> biomePalette() {
         return List.of();
     }
+
     default @NotNull ByteArrayBinaryTag biomeData() {
         return SpongeSchematic.EMPTY_BYTE_ARRAY;
     }

@@ -1,6 +1,5 @@
 package net.hollowcube.schem.util;
 
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +34,7 @@ public interface GameDataProvider {
         return blockState;
     }
 
-    default @NotNull CompoundBinaryTag upgradeBlockEntity(int fromVersion, int toVersion, @NotNull Key key, @NotNull CompoundBinaryTag data) {
+    default @NotNull CompoundBinaryTag upgradeBlockEntity(int fromVersion, int toVersion, @NotNull String id, @NotNull CompoundBinaryTag data) {
         return data;
     }
 
