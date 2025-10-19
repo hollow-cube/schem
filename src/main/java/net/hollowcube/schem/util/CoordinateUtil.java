@@ -3,7 +3,6 @@ package net.hollowcube.schem.util;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -11,23 +10,23 @@ public final class CoordinateUtil {
     private CoordinateUtil() {
     }
 
-    public static int blockIndex(@NotNull Point size, @NotNull Point pos) {
+    public static int blockIndex(Point size, Point pos) {
         return blockIndex(size, pos.blockX(), pos.blockY(), pos.blockZ());
     }
 
-    public static int blockIndex(@NotNull Point size, int x, int y, int z) {
+    public static int blockIndex(Point size, int x, int y, int z) {
         return (int) (x + z * size.x() + y * size.x() * size.z());
     }
 
-    public static @NotNull Point floor(@NotNull Point point) {
+    public static Point floor(Point point) {
         return new Vec(point.blockX(), point.blockY(), point.blockZ());
     }
 
-    public static @NotNull Point abs(@NotNull Point point) {
+    public static Point abs(Point point) {
         return new Vec(Math.abs(point.x()), Math.abs(point.y()), Math.abs(point.z()));
     }
 
-    public static @NotNull Point min(@NotNull Point a, @NotNull Point b) {
+    public static Point min(Point a, Point b) {
         return new Vec(
                 Math.min(a.x(), b.x()),
                 Math.min(a.y(), b.y()),
@@ -35,7 +34,7 @@ public final class CoordinateUtil {
         );
     }
 
-    public static @NotNull Point max(@NotNull Point a, @NotNull Point b) {
+    public static Point max(Point a, Point b) {
         return new Vec(
                 Math.max(a.x(), b.x()),
                 Math.max(a.y(), b.y()),
@@ -43,7 +42,7 @@ public final class CoordinateUtil {
         );
     }
 
-    public static @NotNull Point rotatePos(@NotNull Point point, @NotNull Rotation rotation) {
+    public static Point rotatePos(Point point, Rotation rotation) {
         return switch (rotation) {
             case NONE -> point;
             case CLOCKWISE_90 -> noNegativeZero(new Vec(-point.z(), point.y(), point.x()));
@@ -52,7 +51,7 @@ public final class CoordinateUtil {
         };
     }
 
-    private static @NotNull Point noNegativeZero(@NotNull Point point) {
+    private static Point noNegativeZero(Point point) {
         return new Vec(
                 point.x() == 0 ? 0 : point.x(),
                 point.y() == 0 ? 0 : point.y(),
@@ -60,7 +59,7 @@ public final class CoordinateUtil {
         );
     }
 
-    public static @NotNull Block rotateBlock(@NotNull Block block, @NotNull Rotation rotation) {
+    public static Block rotateBlock(Block block, Rotation rotation) {
         if (rotation == Rotation.NONE) return block;
 
         Block newBlock = block;

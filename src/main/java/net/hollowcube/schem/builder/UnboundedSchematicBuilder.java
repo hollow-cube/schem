@@ -13,7 +13,6 @@ import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
-import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -31,22 +30,22 @@ public class UnboundedSchematicBuilder implements SchematicBuilder {
     private Point offset = Vec.ZERO;
 
     @Override
-    public void metadata(@NotNull String key, @NotNull BinaryTag value) {
+    public void metadata(String key, BinaryTag value) {
         metadata.put(key, value);
     }
 
     @Override
-    public void block(@NotNull Point point, @NotNull Block block) {
+    public void block(Point point, Block block) {
         blockSet.put(CoordinateUtil.floor(point), Objects.requireNonNull(block));
     }
 
     @Override
-    public void offset(@NotNull Point point) {
+    public void offset(Point point) {
         this.offset = point;
     }
 
     @Override
-    public @NotNull Schematic build() {
+    public Schematic build() {
         if (blockSet.isEmpty()) {
             return Schematic.empty();
         }

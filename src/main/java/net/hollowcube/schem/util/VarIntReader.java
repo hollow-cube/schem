@@ -1,14 +1,13 @@
 package net.hollowcube.schem.util;
 
 import net.kyori.adventure.nbt.ByteArrayBinaryTag;
-import org.jetbrains.annotations.NotNull;
 
 // Exists to avoid calling #value() on the tag which copies the underlying array
 public class VarIntReader {
     private final ByteArrayBinaryTag data;
     private int index = 0;
 
-    public VarIntReader(@NotNull ByteArrayBinaryTag data) {
+    public VarIntReader(ByteArrayBinaryTag data) {
         this.data = data;
     }
 

@@ -10,7 +10,6 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.batch.BatchOption;
 import net.minestom.server.instance.batch.RelativeBlockBatch;
 import net.minestom.server.instance.block.Block;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
@@ -28,11 +27,11 @@ import java.util.List;
  */
 public interface Schematic {
 
-    static @NotNull Schematic empty() {
+    static Schematic empty() {
         return SpongeSchematic.EMPTY;
     }
 
-    default @NotNull CompoundBinaryTag metadata() {
+    default CompoundBinaryTag metadata() {
         return CompoundBinaryTag.empty();
     }
 
@@ -57,33 +56,33 @@ public interface Schematic {
         return null;
     }
 
-    @NotNull Point size();
+    Point size();
 
-    default @NotNull Point offset() {
+    default Point offset() {
         return Vec.ZERO;
     }
 
     // Application functions
 
-    default void forEachBlock(@NotNull BlockConsumer consumer) {
+    default void forEachBlock(BlockConsumer consumer) {
         forEachBlock(Rotation.NONE, consumer);
     }
 
-    void forEachBlock(@NotNull Rotation rotation, @NotNull BlockConsumer consumer);
+    void forEachBlock(Rotation rotation, BlockConsumer consumer);
 
-    default @NotNull RelativeBlockBatch createBatch() {
+    default RelativeBlockBatch createBatch() {
         return createBatch(Rotation.NONE, null);
     }
 
-    default @NotNull RelativeBlockBatch createBatch(@NotNull BlockTransformer blockTransformer) {
+    default RelativeBlockBatch createBatch(BlockTransformer blockTransformer) {
         return createBatch(Rotation.NONE, blockTransformer);
     }
 
-    default @NotNull RelativeBlockBatch createBatch(@NotNull Rotation rotation) {
+    default RelativeBlockBatch createBatch(Rotation rotation) {
         return createBatch(rotation, null);
     }
 
-    default @NotNull RelativeBlockBatch createBatch(@NotNull Rotation rotation, @Nullable BlockTransformer blockTransformer) {
+    default RelativeBlockBatch createBatch(Rotation rotation, @Nullable BlockTransformer blockTransformer) {
         RelativeBlockBatch batch = new RelativeBlockBatch(new BatchOption().setCalculateInverse(true));
         forEachBlock(rotation, (pos, block) -> {
             var resultBlock = blockTransformer == null ? block : blockTransformer.transform(pos, block);
@@ -111,7 +110,7 @@ public interface Schematic {
      *
      * @return The (computed) block palette for the schematic
      */
-    default @NotNull List<Block> blockPalette() {
+    default List<Block> blockPalette() {
         return List.of();
     }
 
@@ -125,11 +124,11 @@ public interface Schematic {
      *
      * @return The (computed) block palette for the schematic
      */
-    default @NotNull ByteArrayBinaryTag blockData() {
+    default ByteArrayBinaryTag blockData() {
         return SpongeSchematic.EMPTY_BYTE_ARRAY;
     }
 
-    default @NotNull Collection<BlockEntityData> blockEntities() {
+    default Collection<BlockEntityData> blockEntities() {
         return List.of();
     }
 
@@ -137,15 +136,15 @@ public interface Schematic {
         return false;
     }
 
-    default @NotNull List<String> biomePalette() {
+    default List<String> biomePalette() {
         return List.of();
     }
 
-    default @NotNull ByteArrayBinaryTag biomeData() {
+    default ByteArrayBinaryTag biomeData() {
         return SpongeSchematic.EMPTY_BYTE_ARRAY;
     }
 
-    default @NotNull List<CompoundBinaryTag> entities() {
+    default List<CompoundBinaryTag> entities() {
         return List.of();
     }
 }

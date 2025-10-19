@@ -6,7 +6,6 @@ import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,7 +22,7 @@ public class SpongeSchematicWriter implements SchematicWriter {
     private final GameDataProvider gameData = GameDataProvider.provider();
 
     @Override
-    public byte @NotNull [] write(@NotNull Schematic schematic) {
+    public byte[] write(Schematic schematic) {
         try {
             var out = new ByteArrayOutputStream();
             BinaryTagIO.writer().writeNamed(Map.entry("", createRoot(schematic)), out, BinaryTagIO.Compression.GZIP);
@@ -33,7 +32,7 @@ public class SpongeSchematicWriter implements SchematicWriter {
         }
     }
 
-    private @NotNull CompoundBinaryTag createRoot(@NotNull Schematic schematic) {
+    private CompoundBinaryTag createRoot(Schematic schematic) {
         var root = CompoundBinaryTag.builder();
         root.putInt("Version", FORMAT_VERSION);
         root.putInt("DataVersion", gameData.dataVersion());
@@ -62,7 +61,7 @@ public class SpongeSchematicWriter implements SchematicWriter {
         return CompoundBinaryTag.builder().put("Schematic", root.build()).build();
     }
 
-    private @NotNull CompoundBinaryTag createBlockContainer(@NotNull Schematic schematic) {
+    private CompoundBinaryTag createBlockContainer(Schematic schematic) {
         var container = CompoundBinaryTag.builder();
 
         var palette = schematic.blockPalette();
@@ -87,7 +86,7 @@ public class SpongeSchematicWriter implements SchematicWriter {
         return container.build();
     }
 
-    private @NotNull CompoundBinaryTag createBiomeContainer(@NotNull Schematic schematic) {
+    private CompoundBinaryTag createBiomeContainer(Schematic schematic) {
         var container = CompoundBinaryTag.builder();
         var palette = schematic.biomePalette();
         var paletteTag = CompoundBinaryTag.builder();

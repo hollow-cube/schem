@@ -1,7 +1,6 @@
 package net.hollowcube.schem.util;
 
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -15,11 +14,11 @@ import java.util.Objects;
 public interface GameDataProvider {
     int DATA_VERSION_UNKNOWN = 0;
 
-    static @NotNull GameDataProvider provider() {
+    static GameDataProvider provider() {
         return NoopGameDataProvider.INSTANCE;
     }
 
-    static void replaceGlobals(@NotNull GameDataProvider provider) {
+    static void replaceGlobals(GameDataProvider provider) {
         NoopGameDataProvider.INSTANCE = Objects.requireNonNull(provider, "game data provider");
     }
 
@@ -30,15 +29,15 @@ public interface GameDataProvider {
      */
     int dataVersion();
 
-    default @NotNull String upgradeBlockState(int fromVersion, int toVersion, @NotNull String blockState) {
+    default String upgradeBlockState(int fromVersion, int toVersion, String blockState) {
         return blockState;
     }
 
-    default @NotNull CompoundBinaryTag upgradeBlockEntity(int fromVersion, int toVersion, @NotNull String id, @NotNull CompoundBinaryTag data) {
+    default CompoundBinaryTag upgradeBlockEntity(int fromVersion, int toVersion, String id, CompoundBinaryTag data) {
         return data;
     }
 
-    default @NotNull CompoundBinaryTag upgradeEntity(int fromVersion, int toVersion, @NotNull CompoundBinaryTag data) {
+    default CompoundBinaryTag upgradeEntity(int fromVersion, int toVersion, CompoundBinaryTag data) {
         return data;
     }
 }
