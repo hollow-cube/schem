@@ -5,7 +5,6 @@ import net.hollowcube.schem.BlockEntityData;
 import net.hollowcube.schem.Schematic;
 import net.hollowcube.schem.SpongeSchematic;
 import net.hollowcube.schem.util.GameDataProvider;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.nbt.*;
 import net.minestom.server.command.builder.arguments.minecraft.ArgumentBlockState;
 import net.minestom.server.command.builder.exception.ArgumentSyntaxException;
@@ -20,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static net.hollowcube.schem.old.CoordinateUtil.blockIndex;
 import static net.hollowcube.schem.reader.ReadHelpers.*;
+import static net.hollowcube.schem.util.CoordinateUtil.blockIndex;
 
 /**
  * Implements a reader for the Sponge schematic format versions 1-3 (with transparent upgrade).
@@ -129,8 +128,8 @@ public class SpongeSchematicReader implements SchematicReader {
 
                 var blockEntityData = extracted.build();
                 if (dataVersion < dataVersionMax)
-                    blockEntityData = gameData.upgradeBlockEntity(dataVersion, dataVersionMax, Key.key(id.value()), blockEntityData);
-                blockEntities.put(blockIndex(size, pos), new BlockEntityData(Key.key(id.value()), pos, blockEntityData));
+                    blockEntityData = gameData.upgradeBlockEntity(dataVersion, dataVersionMax, id.value(), blockEntityData);
+                blockEntities.put(blockIndex(size, pos), new BlockEntityData(id.value(), pos, blockEntityData));
             }
         } else {
             var blocksContainer = root.getCompound("Blocks");
@@ -139,7 +138,10 @@ public class SpongeSchematicReader implements SchematicReader {
             for (var entry : blockPaletteObject) {
                 assertTrue(entry.getValue().type() == BinaryTagTypes.INT, "expected palette entry to be an int");
                 var paletteId = ((IntBinaryTag) entry.getValue()).value();
-                var block = ArgumentBlockState.staticParse(entry.getKey());
+                var blockState = entry.getKey();
+                if (dataVersion < dataVersionMax)
+                    blockState = gameData.upgradeBlockState(dataVersion, dataVersionMax, blockState);
+                var block = ArgumentBlockState.staticParse(blockState);
 
                 // Increase the palette size if the input object has missing indices (dumb)
                 if (paletteId >= blockPalette.length) {
@@ -162,8 +164,8 @@ public class SpongeSchematicReader implements SchematicReader {
                 var pos = getRequiredPoint(blockEntity, "Pos");
                 var data = blockEntity.getCompound("Data");
                 if (dataVersion < gameData.dataVersion())
-                    data = gameData.upgradeBlockEntity(dataVersion, gameData.dataVersion(), Key.key(id.value()), data);
-                blockEntities.put(blockIndex(size, pos), new BlockEntityData(Key.key(id.value()), pos, data));
+                    data = gameData.upgradeBlockEntity(dataVersion, gameData.dataVersion(), id.value(), data);
+                blockEntities.put(blockIndex(size, pos), new BlockEntityData(id.value(), pos, data));
             }
         }
 

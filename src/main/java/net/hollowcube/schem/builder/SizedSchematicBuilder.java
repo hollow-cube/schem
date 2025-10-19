@@ -13,7 +13,6 @@ import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
-import net.minestom.server.instance.block.BlockHandler;
 import net.minestom.server.network.NetworkBuffer;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static net.hollowcube.schem.old.CoordinateUtil.blockIndex;
+import static net.hollowcube.schem.util.CoordinateUtil.blockIndex;
 
 @SuppressWarnings("UnstableApiUsage")
 final class SizedSchematicBuilder implements SchematicBuilder {
@@ -62,7 +61,7 @@ final class SizedSchematicBuilder implements SchematicBuilder {
 
         var blockHandler = block.handler();
         if (blockHandler != null) {
-            var blockEntityId = blockHandler.getKey();
+            var blockEntityId = blockHandler.getKey().asString();
             var blockEntityData = Objects.requireNonNullElse(block.nbt(), CompoundBinaryTag.empty());
             blockEntities.put(blockIndex, new BlockEntityData(blockEntityId, relPos, blockEntityData));
         }

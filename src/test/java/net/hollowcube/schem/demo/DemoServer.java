@@ -1,7 +1,7 @@
 package net.hollowcube.schem.demo;
 
-import net.hollowcube.schem.Rotation;
 import net.hollowcube.schem.reader.SpongeSchematicReader;
+import net.hollowcube.schem.util.Rotation;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.Command;

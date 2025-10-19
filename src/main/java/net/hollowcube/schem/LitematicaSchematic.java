@@ -1,6 +1,7 @@
 package net.hollowcube.schem;
 
 import net.hollowcube.schem.util.BlockConsumer;
+import net.hollowcube.schem.util.Rotation;
 import net.kyori.adventure.nbt.*;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.instance.block.Block;

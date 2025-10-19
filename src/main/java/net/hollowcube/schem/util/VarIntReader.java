@@ -3,7 +3,7 @@ package net.hollowcube.schem.util;
 import net.kyori.adventure.nbt.ByteArrayBinaryTag;
 import org.jetbrains.annotations.NotNull;
 
-// Basically just exists to avoid calling #value() on the tag which copies the underlying array
+// Exists to avoid calling #value() on the tag which copies the underlying array
 public class VarIntReader {
     private final ByteArrayBinaryTag data;
     private int index = 0;

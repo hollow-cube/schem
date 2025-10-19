@@ -59,7 +59,7 @@ public class StructureWriter implements SchematicWriter {
             blockTag.putInt("state", block.paletteIndex());
             blockTag.putIntArray("pos", new int[]{block.pos().blockX(), block.pos().blockY(), block.pos().blockZ()});
             if (block.blockEntity() != null)
-                blockTag.put("nbt", block.blockEntity().data().putString("id", block.blockEntity().key().value()));
+                blockTag.put("nbt", block.blockEntity().data().putString("id", block.blockEntity().id()));
             blocks.add(blockTag.build());
         }
         root.put("blocks", blocks.build());
