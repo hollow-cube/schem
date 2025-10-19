@@ -29,7 +29,7 @@ import static net.hollowcube.schem.reader.ReadHelpers.*;
 import static net.hollowcube.schem.util.CoordinateUtil.blockIndex;
 
 @SuppressWarnings("UnstableApiUsage")
-public class LitematicaSchematicReader implements SchematicReader {
+final class LitematicaSchematicReader implements SchematicReader {
     private final GameDataProvider gameData = GameDataProvider.provider();
 
     @Override
@@ -109,8 +109,8 @@ public class LitematicaSchematicReader implements SchematicReader {
                 buffer.write(NetworkBuffer.VAR_INT, paletteIndex);
 
                 // Try to find block entity for this block
-                var blockEntityId = blockPalette[paletteIndex].registry().blockEntity();
-                if (blockEntityId != null) {
+                var blockEntityType = blockPalette[paletteIndex].registry().blockEntityType();
+                if (blockEntityType != null) {
                     var blockEntity = blockEntityData.getOrDefault(index, CompoundBinaryTag.empty());
                     var blockPosition = new Vec(
                             index % size.x(),
@@ -118,9 +118,9 @@ public class LitematicaSchematicReader implements SchematicReader {
                             index / (size.x() * size.z())
                     );
                     if (dataVersion != gameData.dataVersion()) {
-                        blockEntity = gameData.upgradeBlockEntity(dataVersion, gameData.dataVersion(), blockEntityId.asString(), blockEntity);
+                        blockEntity = gameData.upgradeBlockEntity(dataVersion, gameData.dataVersion(), blockEntityType.name(), blockEntity);
                     }
-                    blockEntities.put(blockIndex(size, blockPosition), new BlockEntityData(blockEntityId.asString(), blockPosition, blockEntity));
+                    blockEntities.put(blockIndex(size, blockPosition), new BlockEntityData(blockEntityType.name(), blockPosition, blockEntity));
                 }
             }
         }));

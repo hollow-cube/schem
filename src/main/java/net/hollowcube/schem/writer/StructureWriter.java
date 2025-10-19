@@ -17,7 +17,7 @@ import java.util.Map;
 import static net.hollowcube.schem.writer.WriteHelpers.assertTrue;
 import static net.hollowcube.schem.writer.WriteHelpers.writeBlockState;
 
-public class StructureWriter implements SchematicWriter {
+final class StructureWriter implements SchematicWriter {
     private final GameDataProvider gameData = GameDataProvider.provider();
 
     @Override

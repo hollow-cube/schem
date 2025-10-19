@@ -26,7 +26,7 @@ import static net.hollowcube.schem.util.CoordinateUtil.blockIndex;
  *
  * @see <a href="https://github.com/SpongePowered/Schematic-Specification/tree/master">Format Specification</a>
  */
-public class SpongeSchematicReader implements SchematicReader {
+final class SpongeSchematicReader implements SchematicReader {
     private static final int MIN_VERSION = 1;
     private static final int MAX_VERSION = 3;
 

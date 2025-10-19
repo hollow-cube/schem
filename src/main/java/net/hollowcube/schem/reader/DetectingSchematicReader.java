@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-public class DetectingSchematicReader implements SchematicReader {
+final class DetectingSchematicReader implements SchematicReader {
 
     @Override
     public Schematic read(byte[] data) throws IOException, UnknownSchematicTypeException {

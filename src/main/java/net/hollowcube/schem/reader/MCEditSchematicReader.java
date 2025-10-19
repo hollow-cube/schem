@@ -27,7 +27,7 @@ import static net.hollowcube.schem.util.CoordinateUtil.blockIndex;
 
 // MCEdit/Schematica/WE pre 1.13
 @SuppressWarnings("UnstableApiUsage")
-public class MCEditSchematicReader implements SchematicReader {
+final class MCEditSchematicReader implements SchematicReader {
     private static final Logger logger = LoggerFactory.getLogger(MCEditSchematicReader.class);
     private static final Map<String, Block> LEGACY_BLOCKS;
 

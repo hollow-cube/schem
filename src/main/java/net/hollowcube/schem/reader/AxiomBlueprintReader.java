@@ -15,7 +15,7 @@ import java.util.List;
 
 import static net.hollowcube.schem.reader.ReadHelpers.*;
 
-public class AxiomBlueprintReader implements SchematicReader {
+final class AxiomBlueprintReader implements SchematicReader {
     private final GameDataProvider gameData = GameDataProvider.provider();
 
     @Override

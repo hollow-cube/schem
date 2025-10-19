@@ -16,7 +16,7 @@ import java.util.Map;
  *
  * @see <a href="https://github.com/SpongePowered/Schematic-Specification/tree/master">Format Specification</a>
  */
-public class SpongeSchematicWriter implements SchematicWriter {
+final class SpongeSchematicWriter implements SchematicWriter {
     public static final int FORMAT_VERSION = 3;
 
     private final GameDataProvider gameData = GameDataProvider.provider();

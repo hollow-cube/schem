@@ -16,7 +16,7 @@ import java.util.Map;
 
 import static net.hollowcube.schem.reader.ReadHelpers.*;
 
-public class StructureReader implements SchematicReader {
+final class StructureReader implements SchematicReader {
 
     @Override
     public Schematic read(byte[] data) throws SchematicReadException {
