@@ -7,7 +7,6 @@ import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.NetworkBuffer;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -17,21 +16,21 @@ import java.util.List;
 
 @SuppressWarnings("UnstableApiUsage")
 public record Structure(
-        @NotNull Point size,
-        @NotNull List<BlockInfo> blocks,
-        @NotNull List<Block[]> palettes,
-        @NotNull List<CompoundBinaryTag> entities
+        Point size,
+        List<BlockInfo> blocks,
+        List<Block[]> palettes,
+        List<CompoundBinaryTag> entities
 ) implements Schematic {
 
     public record BlockInfo(
-            @NotNull Point pos,
+            Point pos,
             int paletteIndex,
             @Nullable BlockEntityData blockEntity
     ) {
     }
 
     @Override
-    public void forEachBlock(@NotNull Rotation rotation, @NotNull BlockConsumer consumer) {
+    public void forEachBlock(Rotation rotation, BlockConsumer consumer) {
 
     }
 
@@ -41,7 +40,7 @@ public record Structure(
     }
 
     @Override
-    public @NotNull List<Block> blockPalette() {
+    public List<Block> blockPalette() {
         // All of this logic just ensures the palette contains air.
         int airIndex = -1;
         var palette = palettes.get(0);
@@ -59,7 +58,7 @@ public record Structure(
     }
 
     @Override
-    public @NotNull ByteArrayBinaryTag blockData() {
+    public ByteArrayBinaryTag blockData() {
         // Figure out the index of the air entry, or add one at the end
         int airIndex = -1;
         var palette = palettes.get(0);
@@ -86,7 +85,7 @@ public record Structure(
     }
 
     @Override
-    public @NotNull List<BlockEntityData> blockEntities() {
+    public List<BlockEntityData> blockEntities() {
         var blockEntities = new ArrayList<BlockEntityData>();
         for (var blockInfo : blocks) {
             if (blockInfo.blockEntity == null) continue;

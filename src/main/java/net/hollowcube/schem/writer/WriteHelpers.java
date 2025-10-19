@@ -2,18 +2,17 @@ package net.hollowcube.schem.writer;
 
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.instance.block.Block;
-import org.jetbrains.annotations.NotNull;
 
 import java.text.MessageFormat;
 
 final class WriteHelpers {
 
-    public static void assertTrue(boolean condition, @NotNull String message, @NotNull Object... args) {
+    public static void assertTrue(boolean condition, String message, Object... args) {
         if (condition) return;
         throw new SchematicWriteException(MessageFormat.format(message, args));
     }
 
-    public static @NotNull CompoundBinaryTag writeBlockState(@NotNull Block block) {
+    public static CompoundBinaryTag writeBlockState(Block block) {
         var tag = CompoundBinaryTag.builder();
         tag.putString("Name", block.name());
         var properties = block.properties();

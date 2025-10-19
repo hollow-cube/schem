@@ -4,7 +4,6 @@ import net.hollowcube.schem.AxiomBlueprint;
 import net.hollowcube.schem.Schematic;
 import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -15,7 +14,7 @@ import java.util.Set;
 public class DetectingSchematicReader implements SchematicReader {
 
     @Override
-    public @NotNull Schematic read(byte @NotNull [] data) throws IOException, UnknownSchematicTypeException {
+    public Schematic read(byte[] data) throws IOException, UnknownSchematicTypeException {
         // Axiom Blueprint is the simplest because it always has a known magic number at the start.
         var dis = new DataInputStream(new ByteArrayInputStream(data));
         if (dis.readInt() == AxiomBlueprint.MAGIC_NUMBER) {

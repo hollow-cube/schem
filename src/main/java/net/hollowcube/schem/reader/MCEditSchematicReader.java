@@ -14,7 +14,6 @@ import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.NetworkBuffer;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +34,7 @@ public class MCEditSchematicReader implements SchematicReader {
     private final GameDataProvider gameData = GameDataProvider.provider();
 
     @Override
-    public @NotNull Schematic read(byte @NotNull [] data) throws IOException {
+    public Schematic read(byte[] data) throws IOException {
         try {
             return read(BinaryTagIO.reader().readNamed(
                     new ByteArrayInputStream(data),
@@ -46,7 +45,7 @@ public class MCEditSchematicReader implements SchematicReader {
         }
     }
 
-    public @NotNull Schematic read(@NotNull Map.Entry<String, CompoundBinaryTag> rootPair) {
+    public Schematic read(Map.Entry<String, CompoundBinaryTag> rootPair) {
         assertTrue("Schematic".equals(rootPair.getKey()), "missing required root tag 'Schematic'");
         var root = rootPair.getValue();
 

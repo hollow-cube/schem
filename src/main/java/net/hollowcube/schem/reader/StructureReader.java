@@ -8,7 +8,6 @@ import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
 import net.minestom.server.instance.block.Block;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -20,7 +19,7 @@ import static net.hollowcube.schem.reader.ReadHelpers.*;
 public class StructureReader implements SchematicReader {
 
     @Override
-    public @NotNull Schematic read(byte @NotNull [] data) throws SchematicReadException {
+    public Schematic read(byte[] data) throws SchematicReadException {
         try {
             return read(BinaryTagIO.reader().readNamed(
                     new ByteArrayInputStream(data),
@@ -31,7 +30,7 @@ public class StructureReader implements SchematicReader {
         }
     }
 
-    public @NotNull Schematic read(@NotNull Map.Entry<String, CompoundBinaryTag> rootPair) {
+    public Schematic read(Map.Entry<String, CompoundBinaryTag> rootPair) {
         assertTrue("".equals(rootPair.getKey()), "root tag must be empty, was: '{0}'", rootPair.getKey());
         var root = rootPair.getValue();
         var dataVersion = getRequired(root, "DataVersion", BinaryTagTypes.INT);

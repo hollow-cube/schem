@@ -5,7 +5,6 @@ import net.hollowcube.schem.util.Rotation;
 import net.kyori.adventure.nbt.*;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.instance.block.Block;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
@@ -14,13 +13,13 @@ import java.util.List;
 import java.util.Map;
 
 public record LitematicaSchematic(
-        @NotNull CompoundBinaryTag metadata,
-        @NotNull Point size,
-        @NotNull Map<String, Schematic> regions
+        CompoundBinaryTag metadata,
+        Point size,
+        Map<String, Schematic> regions
 ) implements Schematic {
 
     @Override
-    public void forEachBlock(@NotNull Rotation rotation, @NotNull BlockConsumer consumer) {
+    public void forEachBlock(Rotation rotation, BlockConsumer consumer) {
 
     }
 
@@ -54,17 +53,17 @@ public record LitematicaSchematic(
     }
 
     @Override
-    public @NotNull List<Block> blockPalette() {
+    public List<Block> blockPalette() {
         return Schematic.super.blockPalette();
     }
 
     @Override
-    public @NotNull ByteArrayBinaryTag blockData() {
+    public ByteArrayBinaryTag blockData() {
         return Schematic.super.blockData();
     }
 
     @Override
-    public @NotNull List<BlockEntityData> blockEntities() {
+    public List<BlockEntityData> blockEntities() {
         var allBlockEntites = new ArrayList<BlockEntityData>();
         for (var region : regions.values())
             allBlockEntites.addAll(region.blockEntities());
@@ -72,7 +71,7 @@ public record LitematicaSchematic(
     }
 
     @Override
-    public @NotNull List<CompoundBinaryTag> entities() {
+    public List<CompoundBinaryTag> entities() {
         var allEntities = new ArrayList<CompoundBinaryTag>();
         for (var region : regions.values())
             allEntities.addAll(region.entities());

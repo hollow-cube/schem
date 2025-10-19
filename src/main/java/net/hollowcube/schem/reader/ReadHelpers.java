@@ -4,19 +4,18 @@ import net.kyori.adventure.nbt.*;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
-import org.jetbrains.annotations.NotNull;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
 
 final class ReadHelpers {
 
-    public static void assertTrue(boolean condition, @NotNull String message, @NotNull Object... args) {
+    public static void assertTrue(boolean condition, String message, Object... args) {
         if (condition) return;
         throw new SchematicReadException(MessageFormat.format(message, args));
     }
 
-    public static <T extends BinaryTag> T getRequired(@NotNull CompoundBinaryTag tag, @NotNull String key, @NotNull BinaryTagType<T> type) {
+    public static <T extends BinaryTag> T getRequired(CompoundBinaryTag tag, String key, BinaryTagType<T> type) {
         var value = tag.get(key);
         if (value == null) throw new SchematicReadException("missing required field '" + key + "'");
         if (value.type() != type) throw new SchematicReadException("expected field '" + key + "' to be a " + type);
@@ -24,13 +23,13 @@ final class ReadHelpers {
         return (T) value;
     }
 
-    public static @NotNull Point getRequiredPoint(@NotNull CompoundBinaryTag tag, @NotNull String key) {
+    public static Point getRequiredPoint(CompoundBinaryTag tag, String key) {
         var rawOffset = getRequired(tag, key, BinaryTagTypes.INT_ARRAY);
         assertTrue(rawOffset.size() == 3, "invalid {0} size {1}", key, rawOffset.size());
         return new Vec(rawOffset.get(0), rawOffset.get(1), rawOffset.get(2));
     }
 
-    public static @NotNull Point getRequiredVec3(CompoundBinaryTag tag, String key) {
+    public static Point getRequiredVec3(CompoundBinaryTag tag, String key) {
         var vec = key.isEmpty() ? tag : getRequired(tag, key, BinaryTagTypes.COMPOUND);
         var width = getRequired(vec, "x", BinaryTagTypes.INT).value();
         var height = getRequired(vec, "y", BinaryTagTypes.INT).value();
@@ -38,7 +37,7 @@ final class ReadHelpers {
         return new Vec(width, height, length);
     }
 
-    public static @NotNull Block readBlockState(@NotNull CompoundBinaryTag tag) {
+    public static Block readBlockState(CompoundBinaryTag tag) {
         var name = getRequired(tag, "Name", BinaryTagTypes.STRING).value();
         var block = Block.fromKey(name);
         assertTrue(block != null, "unknown block: {0}", name);
@@ -96,7 +95,7 @@ final class ReadHelpers {
         private final ByteArrayBinaryTag data;
         private int index = 0;
 
-        public VarIntReader(@NotNull ByteArrayBinaryTag data) {
+        public VarIntReader(ByteArrayBinaryTag data) {
             this.data = data;
         }
 

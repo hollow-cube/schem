@@ -17,7 +17,6 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.NetworkBuffer;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -34,7 +33,7 @@ public class LitematicaSchematicReader implements SchematicReader {
     private final GameDataProvider gameData = GameDataProvider.provider();
 
     @Override
-    public @NotNull Schematic read(byte @NotNull [] data) throws IOException {
+    public Schematic read(byte[] data) throws IOException {
         try {
             return read(BinaryTagIO.reader().readNamed(
                     new ByteArrayInputStream(data),
@@ -46,7 +45,7 @@ public class LitematicaSchematicReader implements SchematicReader {
     }
 
     @ApiStatus.Internal
-    public @NotNull Schematic read(@NotNull Map.Entry<String, CompoundBinaryTag> rootPair) {
+    public Schematic read(Map.Entry<String, CompoundBinaryTag> rootPair) {
         assertTrue("".equals(rootPair.getKey()), "root tag must be empty, was: '{0}'", rootPair.getKey());
         var root = rootPair.getValue();
         var dataVersion = getRequired(root, "MinecraftDataVersion", BinaryTagTypes.INT).value();
@@ -69,7 +68,7 @@ public class LitematicaSchematicReader implements SchematicReader {
         return new LitematicaSchematic(metadata, enclosingSize, regions);
     }
 
-    private @NotNull Schematic loadRegion(int dataVersion, @NotNull CompoundBinaryTag region) {
+    private Schematic loadRegion(int dataVersion, CompoundBinaryTag region) {
         var rawPos = getRequiredVec3(region, "Position");
         var rawSize = getRequiredVec3(region, "Size")
                 .withX(x -> x >= 0 ? x - 1 : x + 1)

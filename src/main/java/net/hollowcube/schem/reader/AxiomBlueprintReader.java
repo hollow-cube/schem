@@ -6,7 +6,6 @@ import net.hollowcube.schem.util.GameDataProvider;
 import net.kyori.adventure.nbt.*;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -20,7 +19,7 @@ public class AxiomBlueprintReader implements SchematicReader {
     private final GameDataProvider gameData = GameDataProvider.provider();
 
     @Override
-    public @NotNull Schematic read(byte @NotNull [] data) throws IOException {
+    public Schematic read(byte[] data) throws IOException {
         var dis = new DataInputStream(new ByteArrayInputStream(data));
         assertTrue(dis.readInt() == AxiomBlueprint.MAGIC_NUMBER, "invalid magic number");
 

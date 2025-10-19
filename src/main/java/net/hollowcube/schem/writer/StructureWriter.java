@@ -8,7 +8,6 @@ import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
 import net.minestom.server.instance.block.Block;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,7 +21,7 @@ public class StructureWriter implements SchematicWriter {
     private final GameDataProvider gameData = GameDataProvider.provider();
 
     @Override
-    public byte @NotNull [] write(@NotNull Schematic schematic) {
+    public byte[] write(Schematic schematic) {
         try {
             var out = new ByteArrayOutputStream();
             BinaryTagIO.writer().writeNamed(Map.entry("", createRoot(schematic)), out, BinaryTagIO.Compression.GZIP);
@@ -32,7 +31,7 @@ public class StructureWriter implements SchematicWriter {
         }
     }
 
-    private @NotNull CompoundBinaryTag createRoot(@NotNull Schematic anySchematic) {
+    private CompoundBinaryTag createRoot(Schematic anySchematic) {
         var schematic = fromGenericSchematic(anySchematic);
         var root = CompoundBinaryTag.builder();
         root.putInt("DataVersion", gameData.dataVersion());
@@ -70,7 +69,7 @@ public class StructureWriter implements SchematicWriter {
         return root.build();
     }
 
-    private @NotNull Structure fromGenericSchematic(@NotNull Schematic schematic) {
+    private Structure fromGenericSchematic(Schematic schematic) {
         if (schematic instanceof Structure structure) return structure;
         // Otherwise do the conversion
 
@@ -82,7 +81,7 @@ public class StructureWriter implements SchematicWriter {
         return new Structure(schematic.size(), List.of(), palettes, schematic.entities());
     }
 
-    private @NotNull ListBinaryTag writeBlockPalette(@NotNull Block[] palette) {
+    private ListBinaryTag writeBlockPalette(Block[] palette) {
         var list = ListBinaryTag.builder(BinaryTagTypes.COMPOUND);
         for (var block : palette)
             list.add(writeBlockState(block));

@@ -14,7 +14,6 @@ import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.NetworkBuffer;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,24 +31,24 @@ final class SizedSchematicBuilder implements SchematicBuilder {
 
     private Point offset = Vec.ZERO;
 
-    SizedSchematicBuilder(@NotNull Point size) {
+    SizedSchematicBuilder(Point size) {
         palette.add(Block.AIR.stateId());
         this.blocks = new short[size.blockX() * size.blockY() * size.blockZ()];
         this.size = size;
     }
 
     @Override
-    public void metadata(@NotNull String key, @NotNull BinaryTag value) {
+    public void metadata(String key, BinaryTag value) {
         metadata.put(key, value);
     }
 
     @Override
-    public void block(@NotNull Point point, @NotNull Block block) {
+    public void block(Point point, Block block) {
         block(point.blockX(), point.blockY(), point.blockZ(), block);
     }
 
     @Override
-    public void block(int x, int y, int z, @NotNull Block block) {
+    public void block(int x, int y, int z, Block block) {
         var paletteIndex = palette.indexOf(block.stateId());
         if (paletteIndex == -1) {
             paletteIndex = palette.size();
@@ -68,12 +67,12 @@ final class SizedSchematicBuilder implements SchematicBuilder {
     }
 
     @Override
-    public void offset(@NotNull Point point) {
+    public void offset(Point point) {
         this.offset = point;
     }
 
     @Override
-    public @NotNull Schematic build() {
+    public Schematic build() {
         var paletteBlocks = new ArrayList<Block>(palette.size());
         for (var stateId : palette) paletteBlocks.add(Block.fromStateId(stateId));
 

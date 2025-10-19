@@ -11,7 +11,6 @@ import net.minestom.server.command.builder.exception.ArgumentSyntaxException;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -34,7 +33,7 @@ public class SpongeSchematicReader implements SchematicReader {
     private final GameDataProvider gameData = GameDataProvider.provider();
 
     @Override
-    public @NotNull Schematic read(byte @NotNull [] data) throws SchematicReadException {
+    public Schematic read(byte[] data) throws SchematicReadException {
         try {
             return read(BinaryTagIO.reader().readNamed(
                     new ByteArrayInputStream(data),
@@ -45,7 +44,7 @@ public class SpongeSchematicReader implements SchematicReader {
         }
     }
 
-    public @NotNull Schematic read(@NotNull Map.Entry<String, CompoundBinaryTag> rootPair) {
+    public Schematic read(Map.Entry<String, CompoundBinaryTag> rootPair) {
         var root = rootPair.getValue();
         if ("".equals(rootPair.getKey())) {
             // V3 has the root tag as "", with "Schematic" embedded inside.

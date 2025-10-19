@@ -1,7 +1,6 @@
 package net.hollowcube.schem.util;
 
 import net.minestom.server.utils.Direction;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -23,15 +22,15 @@ public enum Rotation {
      * <p>
      * Minestom rotation supports 45 degree angles, if passed to this function they will be rounded down to the nearest 90 degree angle.
      */
-    public static @NotNull Rotation from(@NotNull net.minestom.server.utils.Rotation rotation) {
+    public static Rotation from(net.minestom.server.utils.Rotation rotation) {
         return values()[rotation.ordinal() / 2];
     }
 
-    public @NotNull Rotation rotate(@NotNull Rotation rotation) {
+    public Rotation rotate(Rotation rotation) {
         return values()[(ordinal() + rotation.ordinal()) % 4];
     }
 
-    public @NotNull Direction rotate(@NotNull Direction input) {
+    public Direction rotate(Direction input) {
         return switch (this) {
             case NONE -> input;
             case CLOCKWISE_90 -> switch (input) {
@@ -58,7 +57,7 @@ public enum Rotation {
         };
     }
 
-    public @NotNull Axis rotateAroundY(@NotNull Axis axis) {
+    public Axis rotateAroundY(Axis axis) {
         return switch (this) {
             case NONE, CLOCKWISE_180 -> axis;
             case CLOCKWISE_90, CLOCKWISE_270 -> switch (axis) {
@@ -69,11 +68,11 @@ public enum Rotation {
         };
     }
 
-    public int rotate(@NotNull Integer rotation) {
+    public int rotate(Integer rotation) {
         return (rotation + this.ordinal() * 4) % 16;
     }
 
-    public @NotNull Map<Direction, String> rotate(@NotNull Map<Direction, String> connections) {
+    public Map<Direction, String> rotate(Map<Direction, String> connections) {
         return switch (this) {
             case NONE -> connections;
             case CLOCKWISE_90 -> Map.of(

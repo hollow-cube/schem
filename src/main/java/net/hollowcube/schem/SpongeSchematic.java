@@ -12,7 +12,6 @@ import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.instance.block.BlockManager;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
@@ -24,15 +23,15 @@ import static net.hollowcube.schem.util.CoordinateUtil.blockIndex;
 
 @SuppressWarnings("UnstableApiUsage")
 public record SpongeSchematic(
-        @NotNull CompoundBinaryTag metadata,
-        @NotNull Point size,
-        @NotNull Point offset,
-        @NotNull List<Block> blockPalette,
-        @NotNull ByteArrayBinaryTag blockData,
-        @NotNull List<String> biomePalette,
-        @NotNull ByteArrayBinaryTag biomeData,
-        @NotNull Int2ObjectMap<BlockEntityData> blockEntitiesByPos,
-        @NotNull List<CompoundBinaryTag> entities
+        CompoundBinaryTag metadata,
+        Point size,
+        Point offset,
+        List<Block> blockPalette,
+        ByteArrayBinaryTag blockData,
+        List<String> biomePalette,
+        ByteArrayBinaryTag biomeData,
+        Int2ObjectMap<BlockEntityData> blockEntitiesByPos,
+        List<CompoundBinaryTag> entities
 ) implements Schematic {
 
     public static final ByteArrayBinaryTag EMPTY_BYTE_ARRAY = ByteArrayBinaryTag.byteArrayBinaryTag();
@@ -51,7 +50,7 @@ public record SpongeSchematic(
     }
 
     @Override
-    public void forEachBlock(@NotNull Rotation rotation, @NotNull BlockConsumer consumer) {
+    public void forEachBlock(Rotation rotation, BlockConsumer consumer) {
         final BlockManager BLOCK_MANAGER = MinecraftServer.getBlockManager();
         var reader = new VarIntReader(this.blockData);
         for (int y = 0; y < size().y(); y++) {
@@ -105,7 +104,7 @@ public record SpongeSchematic(
     }
 
     @Override
-    public @NotNull Collection<BlockEntityData> blockEntities() {
+    public Collection<BlockEntityData> blockEntities() {
         return blockEntitiesByPos.values();
     }
 
