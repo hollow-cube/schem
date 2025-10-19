@@ -3,7 +3,7 @@ package net.hollowcube.schem.demo;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import net.hollowcube.schem.Schematic;
-import net.hollowcube.schem.reader.SpongeSchematicReader;
+import net.hollowcube.schem.reader.SchematicReader;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.block.Block;
 import org.jetbrains.annotations.NotNull;
@@ -26,12 +26,13 @@ public class SchematicLoadTest {
         InputStream palletPath = getClass().getClassLoader().getResourceAsStream("2x2_chunk_vert_palett.json");
         Assertions.assertNotNull(palletPath);
         // Read the pallet data
-        List<BlockData> palletData = new Gson().fromJson(new InputStreamReader(palletPath), new TypeToken<List<BlockData>>(){}.getType());
+        List<BlockData> palletData = new Gson().fromJson(new InputStreamReader(palletPath), new TypeToken<List<BlockData>>() {
+        }.getType());
 
         Assertions.assertNotNull(path);
         byte[] data = path.readAllBytes();
 
-        SpongeSchematicReader reader = new SpongeSchematicReader();
+        SchematicReader reader = SchematicReader.sponge();
         Schematic schematic = reader.read(data);
 
         Assertions.assertNotNull(schematic);

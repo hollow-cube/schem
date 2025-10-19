@@ -1,6 +1,6 @@
 package net.hollowcube.schem.demo;
 
-import net.hollowcube.schem.reader.SpongeSchematicReader;
+import net.hollowcube.schem.reader.SchematicReader;
 import net.hollowcube.schem.util.Rotation;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandSender;
@@ -46,7 +46,7 @@ public class DemoServer {
                 var player = (Player) sender;
 
                 try (var is = getClass().getResourceAsStream("/" + String.join(" ", context.<String[]>get("path")) + ".schem")) {
-                    var schem = new SpongeSchematicReader().read(is.readAllBytes());
+                    var schem = SchematicReader.sponge().read(is.readAllBytes());
                     schem.createBatch(Rotation.NONE).apply(instance, player.getPosition(), () -> {
                         player.sendMessage("Done!");
                     });
