@@ -7,6 +7,8 @@ import net.kyori.adventure.nbt.BinaryTagIO;
 import net.kyori.adventure.nbt.BinaryTagTypes;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
+import net.minestom.server.coordinate.BlockVec;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.instance.block.Block;
 
 import java.io.ByteArrayInputStream;
@@ -30,6 +32,13 @@ final class StructureReader implements SchematicReader {
         }
     }
 
+    public static Point getRequiredPoint(CompoundBinaryTag tag, String key) {
+        var rawOffset = getRequired(tag, key, BinaryTagTypes.LIST);
+        assertTrue(rawOffset.size() == 3, "invalid {0} size {1}", key, rawOffset.size());
+        assertTrue(rawOffset.elementType() == BinaryTagTypes.INT, "position list must contain ints");
+        return new BlockVec(rawOffset.getInt(0), rawOffset.getInt(1), rawOffset.getInt(2));
+    }
+
     public Schematic read(Map.Entry<String, CompoundBinaryTag> rootPair) {
         assertTrue("".equals(rootPair.getKey()), "root tag must be empty, was: '{0}'", rootPair.getKey());
         var root = rootPair.getValue();
@@ -44,7 +53,7 @@ final class StructureReader implements SchematicReader {
         if (singlePalette.size() != 0) {
             var palette = new Block[singlePalette.size()];
             for (int i = 0; i < singlePalette.size(); i++)
-                palette[i++] = readBlockState(singlePalette.getCompound(i));
+                palette[i] = readBlockState(singlePalette.getCompound(i));
             palettes.add(palette);
             paletteSize = palette.length;
         } else {
@@ -53,7 +62,7 @@ final class StructureReader implements SchematicReader {
                 var innerPalette = (ListBinaryTag) innerPaletteRaw;
                 var palette = new Block[innerPalette.size()];
                 for (int i = 0; i < innerPalette.size(); i++)
-                    palette[i++] = readBlockState(innerPalette.getCompound(i));
+                    palette[i] = readBlockState(innerPalette.getCompound(i));
                 palettes.add(palette);
 
                 if (paletteSize == -1) paletteSize = palette.length;
