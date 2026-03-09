@@ -90,7 +90,7 @@ final class StructureReader implements SchematicReader {
 
         // === Entities ===
         var entities = new ArrayList<CompoundBinaryTag>();
-        for (var entity : root.getList("Entities", BinaryTagTypes.COMPOUND)) {
+        for (var entity : root.getList("entities", BinaryTagTypes.COMPOUND)) {
             entities.add((CompoundBinaryTag) entity);
         }
 
