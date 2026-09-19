@@ -38,11 +38,13 @@ final class ReadHelpers {
     }
 
     public static Block readBlockState(CompoundBinaryTag tag) {
-        var name = getRequired(tag, "Name", BinaryTagTypes.STRING).value();
+        // Name/Properties were renamed to id/properties in 26.3 (data version 5006)
+        boolean legacy = !tag.keySet().contains("id");
+        var name = getRequired(tag, legacy ? "Name" : "id", BinaryTagTypes.STRING).value();
         var block = Block.fromKey(name);
         assertTrue(block != null, "unknown block: {0}", name);
 
-        var propsTag = tag.getCompound("Properties");
+        var propsTag = tag.getCompound(legacy ? "Properties" : "properties");
         if (propsTag.size() == 0) return block;
         var properties = new HashMap<String, String>();
         for (var entry : propsTag) {

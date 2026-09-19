@@ -12,16 +12,19 @@ final class WriteHelpers {
         throw new SchematicWriteException(MessageFormat.format(message, args));
     }
 
-    public static CompoundBinaryTag writeBlockState(Block block) {
+    private static final int BLOCK_STATE_FIELD_RENAME_VERSION = 5006;
+
+    public static CompoundBinaryTag writeBlockState(Block block, int dataVersion) {
+        boolean legacy = dataVersion < BLOCK_STATE_FIELD_RENAME_VERSION;
         var tag = CompoundBinaryTag.builder();
-        tag.putString("Name", block.name());
+        tag.putString(legacy ? "Name" : "id", block.name());
         var properties = block.properties();
         if (!properties.isEmpty()) {
             var propsTag = CompoundBinaryTag.builder();
             for (var entry : properties.entrySet()) {
                 propsTag.putString(entry.getKey(), entry.getValue());
             }
-            tag.put("Properties", propsTag.build());
+            tag.put(legacy ? "Properties" : "properties", propsTag.build());
         }
         return tag.build();
     }
