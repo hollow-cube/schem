@@ -8,7 +8,7 @@ junit = "5.11.4"
 junit-platform = "1.10.0"
 logback = "1.5.18" # For tests only
 
-nmcp = "1.0.1"
+nmcp = "1.6.2"
 
 [libraries]
 minestom = { group = "net.minestom", name = "minestom", version.ref = "minestom" }
@@ -23,4 +23,5 @@ logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.
 logback = ["logback-core", "logback-classic"]
 
 [plugins]
-nmcp = { id = "com.gradleup.nmcp.aggregation", version.ref = "nmcp" }
+nmcp = { id = "com.gradleup.nmcp", version.ref = "nmcp" }
+nmcp-aggregation = { id = "com.gradleup.nmcp.aggregation", version.ref = "nmcp" }

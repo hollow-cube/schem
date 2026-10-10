@@ -4,6 +4,7 @@ plugins {
     `maven-publish`
     signing
     alias(libs.plugins.nmcp)
+    alias(libs.plugins.nmcp.aggregation)
 }
 
 group = "dev.hollowcube"
@@ -42,8 +43,10 @@ nmcpAggregation {
         password = System.getenv("SONATYPE_PASSWORD")
         publishingType = if ("dev" in project.version.toString()) "USER_MANAGED" else "AUTOMATIC"
     }
+}
 
-    publishAllProjectsProbablyBreakingProjectIsolation()
+dependencies {
+    nmcpAggregation(project(":"))
 }
 
 publishing.publications.create<MavenPublication>("maven") {
