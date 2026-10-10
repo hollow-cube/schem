@@ -36,10 +36,12 @@ final class MCEditSchematicReader implements SchematicReader {
     @Override
     public Schematic read(byte[] data) throws IOException {
         try {
-            return read(BinaryTagIO.reader().readNamed(
+            return read(
+                BinaryTagIO.reader().readNamed(
                     new ByteArrayInputStream(data),
                     BinaryTagIO.Compression.GZIP
-            ));
+                )
+            );
         } catch (IOException e) {
             throw new SchematicReadException("failed to read root compound", e);
         }
@@ -73,7 +75,8 @@ final class MCEditSchematicReader implements SchematicReader {
             int blockData = blockDataBits[i] & 255;
 
             var newBlock = LEGACY_BLOCKS.get(String.format("%d:%d", blockId, blockData));
-            if (newBlock == null) throw new SchematicReadException("failed to find block for legacy id " + blockId);
+            if (newBlock == null)
+                throw new SchematicReadException("failed to find block for legacy id " + blockId);
 
             int paletteIndex = updatedPalette.indexOf(newBlock);
             if (paletteIndex == -1) {
@@ -83,8 +86,7 @@ final class MCEditSchematicReader implements SchematicReader {
             updatedBlockData[i] = paletteIndex;
         }
         var blockData = NetworkBuffer.makeArray(buffer -> {
-            for (var data : updatedBlockData)
-                buffer.write(NetworkBuffer.VAR_INT, data);
+            for (var data : updatedBlockData) buffer.write(NetworkBuffer.VAR_INT, data);
         });
 
         // === Block Entities ===
@@ -94,35 +96,64 @@ final class MCEditSchematicReader implements SchematicReader {
             var id = getRequired(base, "id", BinaryTagTypes.STRING).value();
             var pos = getRequiredVec3(base, "");
             var data = base.remove("id").remove("x").remove("y").remove("z");
-            blockEntities.put(blockIndex(size, pos), new BlockEntityData(id, pos,
+            blockEntities.put(
+                blockIndex(size, pos),
+                new BlockEntityData(
+                    id,
+                    pos,
                     // Always try to upgrade since this is always a legacy format
-                    gameData.upgradeBlockEntity(GameDataProvider.DATA_VERSION_UNKNOWN, gameData.dataVersion(), id, data)));
+                    gameData.upgradeBlockEntity(
+                        GameDataProvider.DATA_VERSION_UNKNOWN,
+                        gameData.dataVersion(),
+                        id,
+                        data
+                    )
+                )
+            );
         }
 
         // === Entities ===
         var entities = new ArrayList<CompoundBinaryTag>();
         for (var entityTag : root.getList("Entities", BinaryTagTypes.COMPOUND)) {
             // Always try to upgrade since this is always a legacy format
-            entities.add(gameData.upgradeEntity(GameDataProvider.DATA_VERSION_UNKNOWN, gameData.dataVersion(), (CompoundBinaryTag) entityTag));
+            entities.add(
+                gameData.upgradeEntity(
+                    GameDataProvider.DATA_VERSION_UNKNOWN,
+                    gameData.dataVersion(),
+                    (CompoundBinaryTag) entityTag
+                )
+            );
         }
 
         return new SpongeSchematic(
-                CompoundBinaryTag.empty(), size, offset,
-                updatedPalette, ByteArrayBinaryTag.byteArrayBinaryTag(blockData),
-                List.of(), SpongeSchematic.EMPTY_BYTE_ARRAY,
-                blockEntities, entities
+            CompoundBinaryTag.empty(),
+            size,
+            offset,
+            updatedPalette,
+            ByteArrayBinaryTag.byteArrayBinaryTag(blockData),
+            List.of(),
+            SpongeSchematic.EMPTY_BYTE_ARRAY,
+            blockEntities,
+            entities
         );
     }
 
     static {
         var entries = new HashMap<String, Block>();
-        try (var is = MCEditSchematicReader.class.getResourceAsStream("/net/hollowcube/schem/legacy_blocks.json")) {
+        try (
+            var is = MCEditSchematicReader.class.getResourceAsStream(
+                "/net/hollowcube/schem/legacy_blocks.json"
+            )
+        ) {
             Objects.requireNonNull(is, "legacy_blocks.json not found");
             var blockData = new Gson().fromJson(new InputStreamReader(is), JsonObject.class);
             for (var entry : blockData.entrySet())
                 entries.put(entry.getKey(), Block.fromState(entry.getValue().getAsString()));
         } catch (Exception e) {
-            logger.error("failed to load legacy blocks (loading a legacy schematic will fail): {}", e.getMessage());
+            logger.error(
+                "failed to load legacy blocks (loading a legacy schematic will fail): {}",
+                e.getMessage()
+            );
         }
         LEGACY_BLOCKS = Map.copyOf(entries);
     }

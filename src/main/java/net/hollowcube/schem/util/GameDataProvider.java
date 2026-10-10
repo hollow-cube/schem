@@ -33,11 +33,20 @@ public interface GameDataProvider {
         return blockState;
     }
 
-    default CompoundBinaryTag upgradeBlockEntity(int fromVersion, int toVersion, String id, CompoundBinaryTag data) {
+    default CompoundBinaryTag upgradeBlockEntity(
+        int fromVersion,
+        int toVersion,
+        String id,
+        CompoundBinaryTag data
+    ) {
         return data;
     }
 
-    default CompoundBinaryTag upgradeEntity(int fromVersion, int toVersion, CompoundBinaryTag data) {
+    default CompoundBinaryTag upgradeEntity(
+        int fromVersion,
+        int toVersion,
+        CompoundBinaryTag data
+    ) {
         return data;
     }
 }

@@ -1,7 +1,7 @@
 package net.hollowcube.schem;
 
-import net.hollowcube.schem.util.CoordinateUtil;
 import net.hollowcube.schem.util.BlockConsumer;
+import net.hollowcube.schem.util.CoordinateUtil;
 import net.hollowcube.schem.util.Rotation;
 import net.kyori.adventure.nbt.ByteArrayBinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
@@ -20,31 +20,27 @@ import java.util.Locale;
 
 @SuppressWarnings("UnstableApiUsage")
 public record Structure(
-        Point size,
-        List<BlockInfo> blocks,
-        List<Block[]> palettes,
-        List<CompoundBinaryTag> entities
+    Point size,
+    List<BlockInfo> blocks,
+    List<Block[]> palettes,
+    List<CompoundBinaryTag> entities
 ) implements Schematic {
 
-    public record BlockInfo(
-            Point pos,
-            int paletteIndex,
-            @Nullable BlockEntityData blockEntity
-    ) {
-    }
+    public record BlockInfo(Point pos, int paletteIndex, @Nullable BlockEntityData blockEntity) {}
 
     @Override
     public void forEachBlock(Rotation rotation, BlockConsumer consumer) {
         final BlockManager BLOCK_MANAGER = MinecraftServer.getBlockManager();
-        for(BlockInfo blockInfo : this.blocks) {
+        for (BlockInfo blockInfo : this.blocks) {
             Block block = this.palettes.getFirst()[blockInfo.paletteIndex];
-            if(blockInfo.blockEntity != null) {
-                block = block.withHandler(BLOCK_MANAGER.getHandlerOrDummy(blockInfo.blockEntity.id().toLowerCase(Locale.ROOT)))
-                        .withNbt(blockInfo.blockEntity.data());
+            if (blockInfo.blockEntity != null) {
+                var handlerId = blockInfo.blockEntity.id().toLowerCase(Locale.ROOT);
+                block = block.withHandler(BLOCK_MANAGER.getHandlerOrDummy(handlerId))
+                    .withNbt(blockInfo.blockEntity.data());
             }
             consumer.accept(
-                    CoordinateUtil.rotatePos(blockInfo.pos, rotation),
-                    CoordinateUtil.rotateBlock(block, rotation)
+                CoordinateUtil.rotatePos(blockInfo.pos, rotation),
+                CoordinateUtil.rotateBlock(block, rotation)
             );
         }
     }
@@ -89,14 +85,15 @@ public record Structure(
         var indices = new int[size.blockX() * size.blockY() * size.blockZ()];
         Arrays.fill(indices, airIndex);
         for (var bi : blocks) {
-            var index = (int) (bi.pos.blockX() + bi.pos.blockZ() * size.x() + bi.pos.blockY() * size.x() * size.z());
-            indices[index] = bi.paletteIndex;
+            indices[CoordinateUtil.blockIndex(size, bi.pos)] = bi.paletteIndex;
         }
-        return ByteArrayBinaryTag.byteArrayBinaryTag(NetworkBuffer.makeArray(buffer -> {
-            for (var paletteIndex : indices) {
-                buffer.write(NetworkBuffer.VAR_INT, paletteIndex);
-            }
-        }));
+        return ByteArrayBinaryTag.byteArrayBinaryTag(
+            NetworkBuffer.makeArray(buffer -> {
+                for (var paletteIndex : indices) {
+                    buffer.write(NetworkBuffer.VAR_INT, paletteIndex);
+                }
+            })
+        );
     }
 
     @Override

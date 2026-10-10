@@ -24,7 +24,11 @@ final class StructureWriter implements SchematicWriter {
     public byte[] write(Schematic schematic) {
         try {
             var out = new ByteArrayOutputStream();
-            BinaryTagIO.writer().writeNamed(Map.entry("", createRoot(schematic)), out, BinaryTagIO.Compression.GZIP);
+            BinaryTagIO.writer().writeNamed(
+                Map.entry("", createRoot(schematic)),
+                out,
+                BinaryTagIO.Compression.GZIP
+            );
             return out.toByteArray();
         } catch (IOException e) {
             throw new SchematicWriteException("failed to write schematic", e);
@@ -37,7 +41,7 @@ final class StructureWriter implements SchematicWriter {
         root.putInt("DataVersion", gameData.dataVersion());
 
         var size = schematic.size();
-        root.putIntArray("size", new int[]{size.blockX(), size.blockY(), size.blockZ()});
+        root.putIntArray("size", new int[] {size.blockX(), size.blockY(), size.blockZ()});
 
         // Palettes
         var palettes = schematic.palettes();
@@ -56,9 +60,15 @@ final class StructureWriter implements SchematicWriter {
         for (var block : schematic.blocks()) {
             var blockTag = CompoundBinaryTag.builder();
             blockTag.putInt("state", block.paletteIndex());
-            blockTag.putIntArray("pos", new int[]{block.pos().blockX(), block.pos().blockY(), block.pos().blockZ()});
+            blockTag.putIntArray(
+                "pos",
+                new int[] {block.pos().blockX(), block.pos().blockY(), block.pos().blockZ()}
+            );
             if (block.blockEntity() != null)
-                blockTag.put("nbt", block.blockEntity().data().putString("id", block.blockEntity().id()));
+                blockTag.put(
+                    "nbt",
+                    block.blockEntity().data().putString("id", block.blockEntity().id())
+                );
             blocks.add(blockTag.build());
         }
         root.put("blocks", blocks.build());
@@ -83,8 +93,7 @@ final class StructureWriter implements SchematicWriter {
 
     private ListBinaryTag writeBlockPalette(Block[] palette) {
         var list = ListBinaryTag.builder(BinaryTagTypes.COMPOUND);
-        for (var block : palette)
-            list.add(writeBlockState(block, gameData.dataVersion()));
+        for (var block : palette) list.add(writeBlockState(block, gameData.dataVersion()));
         return list.build();
     }
 }

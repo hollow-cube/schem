@@ -6,9 +6,10 @@ import net.minestom.server.instance.block.Block;
 
 import java.util.Map;
 
+import static java.util.Map.entry;
+
 public final class CoordinateUtil {
-    private CoordinateUtil() {
-    }
+    private CoordinateUtil() {}
 
     public static int blockIndex(Point size, Point pos) {
         return blockIndex(size, pos.blockX(), pos.blockY(), pos.blockZ());
@@ -27,19 +28,11 @@ public final class CoordinateUtil {
     }
 
     public static Point min(Point a, Point b) {
-        return new Vec(
-                Math.min(a.x(), b.x()),
-                Math.min(a.y(), b.y()),
-                Math.min(a.z(), b.z())
-        );
+        return new Vec(Math.min(a.x(), b.x()), Math.min(a.y(), b.y()), Math.min(a.z(), b.z()));
     }
 
     public static Point max(Point a, Point b) {
-        return new Vec(
-                Math.max(a.x(), b.x()),
-                Math.max(a.y(), b.y()),
-                Math.max(a.z(), b.z())
-        );
+        return new Vec(Math.max(a.x(), b.x()), Math.max(a.y(), b.y()), Math.max(a.z(), b.z()));
     }
 
     public static Point rotatePos(Point point, Rotation rotation) {
@@ -53,9 +46,9 @@ public final class CoordinateUtil {
 
     private static Point noNegativeZero(Point point) {
         return new Vec(
-                point.x() == 0 ? 0 : point.x(),
-                point.y() == 0 ? 0 : point.y(),
-                point.z() == 0 ? 0 : point.z()
+            point.x() == 0 ? 0 : point.x(),
+            point.y() == 0 ? 0 : point.y(),
+            point.z() == 0 ? 0 : point.z()
         );
     }
 
@@ -80,12 +73,18 @@ public final class CoordinateUtil {
     private static Block rotateFacing(Block block, Rotation rotation) {
         return switch (rotation) {
             case NONE -> block;
-            case CLOCKWISE_90 -> block.withProperty("facing",
-                    rotate90(block.getProperty("facing")));
-            case CLOCKWISE_180 -> block.withProperty("facing",
-                    rotate90(rotate90(block.getProperty("facing"))));
-            case CLOCKWISE_270 -> block.withProperty("facing",
-                    rotate90(rotate90(rotate90(block.getProperty("facing")))));
+            case CLOCKWISE_90 -> block.withProperty(
+                "facing",
+                rotate90(block.getProperty("facing"))
+            );
+            case CLOCKWISE_180 -> block.withProperty(
+                "facing",
+                rotate90(rotate90(block.getProperty("facing")))
+            );
+            case CLOCKWISE_270 -> block.withProperty(
+                "facing",
+                rotate90(rotate90(rotate90(block.getProperty("facing"))))
+            );
         };
     }
 
@@ -96,24 +95,30 @@ public final class CoordinateUtil {
     private static Block rotateFence(Block block, Rotation rotation) {
         return switch (rotation) {
             case NONE -> block;
-            case CLOCKWISE_90 -> block.withProperties(Map.of(
-                    "north", block.getProperty("west"),
-                    "east", block.getProperty("north"),
-                    "south", block.getProperty("east"),
-                    "west", block.getProperty("south")
-            ));
-            case CLOCKWISE_180 -> block.withProperties(Map.of(
-                    "north", block.getProperty("south"),
-                    "east", block.getProperty("west"),
-                    "south", block.getProperty("north"),
-                    "west", block.getProperty("east")
-            ));
-            case CLOCKWISE_270 -> block.withProperties(Map.of(
-                    "north", block.getProperty("east"),
-                    "east", block.getProperty("south"),
-                    "south", block.getProperty("west"),
-                    "west", block.getProperty("north")
-            ));
+            case CLOCKWISE_90 -> block.withProperties(
+                Map.ofEntries(
+                    entry("north", block.getProperty("west")),
+                    entry("east", block.getProperty("north")),
+                    entry("south", block.getProperty("east")),
+                    entry("west", block.getProperty("south"))
+                )
+            );
+            case CLOCKWISE_180 -> block.withProperties(
+                Map.ofEntries(
+                    entry("north", block.getProperty("south")),
+                    entry("east", block.getProperty("west")),
+                    entry("south", block.getProperty("north")),
+                    entry("west", block.getProperty("east"))
+                )
+            );
+            case CLOCKWISE_270 -> block.withProperties(
+                Map.ofEntries(
+                    entry("north", block.getProperty("east")),
+                    entry("east", block.getProperty("south")),
+                    entry("south", block.getProperty("west")),
+                    entry("west", block.getProperty("north"))
+                )
+            );
         };
     }
 

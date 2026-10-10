@@ -35,10 +35,12 @@ final class LitematicaSchematicReader implements SchematicReader {
     @Override
     public Schematic read(byte[] data) throws IOException {
         try {
-            return read(BinaryTagIO.reader().readNamed(
+            return read(
+                BinaryTagIO.reader().readNamed(
                     new ByteArrayInputStream(data),
                     BinaryTagIO.Compression.GZIP
-            ));
+                )
+            );
         } catch (IOException e) {
             throw new SchematicReadException("failed to read root compound", e);
         }
@@ -46,18 +48,39 @@ final class LitematicaSchematicReader implements SchematicReader {
 
     @ApiStatus.Internal
     public Schematic read(Map.Entry<String, CompoundBinaryTag> rootPair) {
-        assertTrue("".equals(rootPair.getKey()), "root tag must be empty, was: '{0}'", rootPair.getKey());
+        assertTrue(
+            "".equals(rootPair.getKey()),
+            "root tag must be empty, was: '{0}'",
+            rootPair.getKey()
+        );
         var root = rootPair.getValue();
         var dataVersion = getRequired(root, "MinecraftDataVersion", BinaryTagTypes.INT).value();
         var version = getRequired(root, "Version", BinaryTagTypes.INT).value();
         var subVersion = getRequired(root, "SubVersion", BinaryTagTypes.INT).value();
-        assertTrue(version == 6 && subVersion == 1, "unsupported version (only 6.1 is supported): {0}.{1}", version, subVersion);
+        assertTrue(
+            version == 6 && subVersion == 1,
+            "unsupported version (only 6.1 is supported): {0}.{1}",
+            version,
+            subVersion
+        );
 
         var metadata = getRequired(root, "Metadata", BinaryTagTypes.COMPOUND);
         var enclosingSize = getRequiredVec3(metadata, "EnclosingSize");
-        assertTrue(enclosingSize.blockX() > 0, "invalid enclosing width: {0}", enclosingSize.blockX());
-        assertTrue(enclosingSize.blockY() > 0, "invalid enclosing height: {0}", enclosingSize.blockY());
-        assertTrue(enclosingSize.blockZ() > 0, "invalid enclosing length: {0}", enclosingSize.blockZ());
+        assertTrue(
+            enclosingSize.blockX() > 0,
+            "invalid enclosing width: {0}",
+            enclosingSize.blockX()
+        );
+        assertTrue(
+            enclosingSize.blockY() > 0,
+            "invalid enclosing height: {0}",
+            enclosingSize.blockY()
+        );
+        assertTrue(
+            enclosingSize.blockZ() > 0,
+            "invalid enclosing length: {0}",
+            enclosingSize.blockZ()
+        );
 
         var regions = new HashMap<String, Schematic>();
         for (var regionPair : getRequired(root, "Regions", BinaryTagTypes.COMPOUND)) {
@@ -70,10 +93,9 @@ final class LitematicaSchematicReader implements SchematicReader {
 
     private Schematic loadRegion(int dataVersion, CompoundBinaryTag region) {
         var rawPos = getRequiredVec3(region, "Position");
-        var rawSize = getRequiredVec3(region, "Size")
-                .withX(x -> x >= 0 ? x - 1 : x + 1)
-                .withY(y -> y >= 0 ? y - 1 : y + 1)
-                .withZ(z -> z >= 0 ? z - 1 : z + 1);
+        var rawSize = getRequiredVec3(region, "Size").withX(x -> x >= 0 ? x - 1 : x + 1)
+            .withY(y -> y >= 0 ? y - 1 : y + 1)
+            .withZ(z -> z >= 0 ? z - 1 : z + 1);
         var relativeEnd = rawSize.add(rawPos);
         var absoluteMin = CoordinateUtil.min(rawPos, relativeEnd);
         var absoluteMax = CoordinateUtil.max(rawPos, relativeEnd);
@@ -94,36 +116,51 @@ final class LitematicaSchematicReader implements SchematicReader {
             var pos = getRequiredVec3(blockEntity, "");
             var data = blockEntity.remove("x").remove("y").remove("z");
 
-            var index = (int) (pos.blockX() + pos.blockZ() * size.x() + pos.blockY() * size.x() * size.z());
-            blockEntityData.put(index, data);
+            blockEntityData.put(blockIndex(size, pos), data);
         }
 
         var blockEntities = new Int2ObjectArrayMap<BlockEntityData>();
         var packedBlocks = getRequired(region, "BlockStates", BinaryTagTypes.LONG_ARRAY).value();
         var unpackedBlocks = new int[size.blockX() * size.blockY() * size.blockZ()];
-        var bitsPerEntry = Math.max(2, Integer.SIZE - Integer.numberOfLeadingZeros(blockPalette.length - 1));
+        var bitsPerEntry = Math.max(
+            2,
+            Integer.SIZE - Integer.numberOfLeadingZeros(blockPalette.length - 1)
+        );
         ReadHelpers.unpackPaletteTight(unpackedBlocks, packedBlocks, bitsPerEntry);
-        var blockData = ByteArrayBinaryTag.byteArrayBinaryTag(NetworkBuffer.makeArray(buffer -> {
-            for (int index = 0; index < unpackedBlocks.length; index++) {
-                var paletteIndex = unpackedBlocks[index];
-                buffer.write(NetworkBuffer.VAR_INT, paletteIndex);
+        var blockData = ByteArrayBinaryTag.byteArrayBinaryTag(
+            NetworkBuffer.makeArray(buffer -> {
+                for (int index = 0; index < unpackedBlocks.length; index++) {
+                    var paletteIndex = unpackedBlocks[index];
+                    buffer.write(NetworkBuffer.VAR_INT, paletteIndex);
 
-                // Try to find block entity for this block
-                var blockEntityType = blockPalette[paletteIndex].registry().blockEntityType();
-                if (blockEntityType != null) {
-                    var blockEntity = blockEntityData.getOrDefault(index, CompoundBinaryTag.empty());
-                    var blockPosition = new Vec(
+                    // Try to find block entity for this block
+                    var blockEntityType = blockPalette[paletteIndex].registry().blockEntityType();
+                    if (blockEntityType != null) {
+                        var blockEntity = blockEntityData.getOrDefault(
+                            index,
+                            CompoundBinaryTag.empty()
+                        );
+                        var blockPosition = new Vec(
                             index % size.x(),
                             (index / size.x()) % size.z(),
                             index / (size.x() * size.z())
-                    );
-                    if (dataVersion != gameData.dataVersion()) {
-                        blockEntity = gameData.upgradeBlockEntity(dataVersion, gameData.dataVersion(), blockEntityType.name(), blockEntity);
+                        );
+                        if (dataVersion != gameData.dataVersion()) {
+                            blockEntity = gameData.upgradeBlockEntity(
+                                dataVersion,
+                                gameData.dataVersion(),
+                                blockEntityType.name(),
+                                blockEntity
+                            );
+                        }
+                        blockEntities.put(
+                            blockIndex(size, blockPosition),
+                            new BlockEntityData(blockEntityType.name(), blockPosition, blockEntity)
+                        );
                     }
-                    blockEntities.put(blockIndex(size, blockPosition), new BlockEntityData(blockEntityType.name(), blockPosition, blockEntity));
                 }
-            }
-        }));
+            })
+        );
 
         // === Entities ===
         var entities = new ArrayList<CompoundBinaryTag>();
@@ -135,10 +172,15 @@ final class LitematicaSchematicReader implements SchematicReader {
         }
 
         return new SpongeSchematic(
-                CompoundBinaryTag.empty(), size, absoluteMin,
-                List.of(blockPalette), blockData,
-                List.of(), SpongeSchematic.EMPTY_BYTE_ARRAY,
-                blockEntities, entities
+            CompoundBinaryTag.empty(),
+            size,
+            absoluteMin,
+            List.of(blockPalette),
+            blockData,
+            List.of(),
+            SpongeSchematic.EMPTY_BYTE_ARRAY,
+            blockEntities,
+            entities
         );
     }
 }

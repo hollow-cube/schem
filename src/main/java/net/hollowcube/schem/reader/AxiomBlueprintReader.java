@@ -28,7 +28,10 @@ final class AxiomBlueprintReader implements SchematicReader {
         var thumbnail = ByteArrayBinaryTag.byteArrayBinaryTag(dis.readNBytes(dis.readInt()));
 
         var rawBlockData = dis.readNBytes(dis.readInt());
-        var blockDataNbt = BinaryTagIO.unlimitedReader().read(new ByteArrayInputStream(rawBlockData), BinaryTagIO.Compression.GZIP);
+        var blockDataNbt = BinaryTagIO.unlimitedReader().read(
+            new ByteArrayInputStream(rawBlockData),
+            BinaryTagIO.Compression.GZIP
+        );
         var dataVersion = blockDataNbt.getInt("DataVersion", gameData.dataVersion());
 
         var regions = new ArrayList<AxiomBlueprint.SectionData>();
@@ -58,7 +61,11 @@ final class AxiomBlueprintReader implements SchematicReader {
 
             IntArrayBinaryTag blockData = null;
             if (blockStates.keySet().contains("data")) {
-                var packedBlocks = getRequired(blockStates, "data", BinaryTagTypes.LONG_ARRAY).value();
+                var packedBlocks = getRequired(
+                    blockStates,
+                    "data",
+                    BinaryTagTypes.LONG_ARRAY
+                ).value();
                 var unpackedBlocks = new int[AxiomBlueprint.BLOCK_PALETTE_SIZE];
                 var bitsPerEntry = packedBlocks.length * 64 / AxiomBlueprint.BLOCK_PALETTE_SIZE;
                 ReadHelpers.unpackPalette(unpackedBlocks, packedBlocks, bitsPerEntry);

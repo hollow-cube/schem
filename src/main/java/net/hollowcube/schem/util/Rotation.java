@@ -4,6 +4,8 @@ import net.minestom.server.utils.Direction;
 
 import java.util.Map;
 
+import static java.util.Map.entry;
+
 /**
  * Represents a 90 degree rotation around the Y axis.
  */
@@ -11,7 +13,8 @@ public enum Rotation {
     NONE,
     CLOCKWISE_90,
     CLOCKWISE_180,
-    CLOCKWISE_270;
+    CLOCKWISE_270,
+    ;
 
     public int toDegrees() {
         return ordinal() * 90;
@@ -75,23 +78,23 @@ public enum Rotation {
     public Map<Direction, String> rotate(Map<Direction, String> connections) {
         return switch (this) {
             case NONE -> connections;
-            case CLOCKWISE_90 -> Map.of(
-                    Direction.NORTH, connections.get(Direction.WEST),
-                    Direction.EAST, connections.get(Direction.NORTH),
-                    Direction.SOUTH, connections.get(Direction.EAST),
-                    Direction.WEST, connections.get(Direction.SOUTH)
+            case CLOCKWISE_90 -> Map.ofEntries(
+                entry(Direction.NORTH, connections.get(Direction.WEST)),
+                entry(Direction.EAST, connections.get(Direction.NORTH)),
+                entry(Direction.SOUTH, connections.get(Direction.EAST)),
+                entry(Direction.WEST, connections.get(Direction.SOUTH))
             );
-            case CLOCKWISE_180 -> Map.of(
-                    Direction.NORTH, connections.get(Direction.SOUTH),
-                    Direction.EAST, connections.get(Direction.WEST),
-                    Direction.SOUTH, connections.get(Direction.NORTH),
-                    Direction.WEST, connections.get(Direction.EAST)
+            case CLOCKWISE_180 -> Map.ofEntries(
+                entry(Direction.NORTH, connections.get(Direction.SOUTH)),
+                entry(Direction.EAST, connections.get(Direction.WEST)),
+                entry(Direction.SOUTH, connections.get(Direction.NORTH)),
+                entry(Direction.WEST, connections.get(Direction.EAST))
             );
-            case CLOCKWISE_270 -> Map.of(
-                    Direction.NORTH, connections.get(Direction.EAST),
-                    Direction.EAST, connections.get(Direction.SOUTH),
-                    Direction.SOUTH, connections.get(Direction.WEST),
-                    Direction.WEST, connections.get(Direction.NORTH)
+            case CLOCKWISE_270 -> Map.ofEntries(
+                entry(Direction.NORTH, connections.get(Direction.EAST)),
+                entry(Direction.EAST, connections.get(Direction.SOUTH)),
+                entry(Direction.SOUTH, connections.get(Direction.WEST)),
+                entry(Direction.WEST, connections.get(Direction.NORTH))
             );
         };
     }

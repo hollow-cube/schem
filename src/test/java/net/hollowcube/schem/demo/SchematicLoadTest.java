@@ -17,17 +17,20 @@ import java.io.InputStreamReader;
 import java.time.Instant;
 import java.util.List;
 
-
 public class SchematicLoadTest {
     @Test
     public void testSpongeSchematicLoad() throws IOException {
         InputStream path = getClass().getClassLoader().getResourceAsStream("2x2_chunk_vert.schem");
         // load 2x2_chunk_vert_pallet.json
-        InputStream palletPath = getClass().getClassLoader().getResourceAsStream("2x2_chunk_vert_palett.json");
+        InputStream palletPath = getClass().getClassLoader()
+            .getResourceAsStream("2x2_chunk_vert_palett.json");
         Assertions.assertNotNull(palletPath);
         // Read the pallet data
-        List<BlockData> palletData = new Gson().fromJson(new InputStreamReader(palletPath), new TypeToken<List<BlockData>>() {
-        }.getType());
+        List<BlockData> palletData = new Gson()
+            .fromJson(
+                new InputStreamReader(palletPath),
+                new TypeToken<List<BlockData>>() {}.getType()
+            );
 
         Assertions.assertNotNull(path);
         byte[] data = path.readAllBytes();

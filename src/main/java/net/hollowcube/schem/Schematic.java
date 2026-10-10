@@ -82,10 +82,17 @@ public interface Schematic {
         return createBatch(rotation, null);
     }
 
-    default RelativeBlockBatch createBatch(Rotation rotation, @Nullable BlockTransformer blockTransformer) {
-        RelativeBlockBatch batch = new RelativeBlockBatch(new BatchOption().setCalculateInverse(true));
+    default RelativeBlockBatch createBatch(
+        Rotation rotation,
+        @Nullable BlockTransformer blockTransformer
+    ) {
+        RelativeBlockBatch batch = new RelativeBlockBatch(
+            new BatchOption().setCalculateInverse(true)
+        );
         forEachBlock(rotation, (pos, block) -> {
-            var resultBlock = blockTransformer == null ? block : blockTransformer.transform(pos, block);
+            var resultBlock = blockTransformer == null
+                ? block
+                : blockTransformer.transform(pos, block);
             if (resultBlock != null) batch.setBlock(pos, resultBlock);
         });
         return batch;

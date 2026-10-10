@@ -45,11 +45,13 @@ public class DemoServer {
             public void execute(@NotNull CommandSender sender, @NotNull CommandContext context) {
                 var player = (Player) sender;
 
-                try (var is = getClass().getResourceAsStream("/" + String.join(" ", context.<String[]>get("path")) + ".schem")) {
+                var path = "/" + String.join(" ", context.<String[]>get("path")) + ".schem";
+                try (var is = getClass().getResourceAsStream(path)) {
                     var schem = SchematicReader.sponge().read(is.readAllBytes());
-                    schem.createBatch(Rotation.NONE).apply(instance, player.getPosition(), _ -> {
-                        player.sendMessage("Done!");
-                    });
+                    schem.createBatch(Rotation.NONE)
+                        .apply(instance, player.getPosition(), _ -> {
+                            player.sendMessage("Done!");
+                        });
                 } catch (Exception e) {
                     player.sendMessage("Failed to paste schematic: " + e.getMessage());
                     e.printStackTrace();

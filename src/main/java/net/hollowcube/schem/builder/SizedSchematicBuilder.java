@@ -61,8 +61,14 @@ final class SizedSchematicBuilder implements SchematicBuilder {
         var blockHandler = block.handler();
         if (blockHandler != null) {
             var blockEntityId = blockHandler.getKey().asString();
-            var blockEntityData = Objects.requireNonNullElse(block.nbt(), CompoundBinaryTag.empty());
-            blockEntities.put(blockIndex, new BlockEntityData(blockEntityId, relPos, blockEntityData));
+            var blockEntityData = Objects.requireNonNullElse(
+                block.nbt(),
+                CompoundBinaryTag.empty()
+            );
+            blockEntities.put(
+                blockIndex,
+                new BlockEntityData(blockEntityId, relPos, blockEntityData)
+            );
         }
     }
 
@@ -76,16 +82,22 @@ final class SizedSchematicBuilder implements SchematicBuilder {
         var paletteBlocks = new ArrayList<Block>(palette.size());
         for (var stateId : palette) paletteBlocks.add(Block.fromStateId(stateId));
 
-        var blockData = ByteArrayBinaryTag.byteArrayBinaryTag(NetworkBuffer.makeArray(buffer -> {
-            for (var paletteIdx : blocks)
-                buffer.write(NetworkBuffer.VAR_INT, (int) paletteIdx);
-        }));
+        var blockData = ByteArrayBinaryTag.byteArrayBinaryTag(
+            NetworkBuffer.makeArray(buffer -> {
+                for (var paletteIdx : blocks) buffer.write(NetworkBuffer.VAR_INT, (int) paletteIdx);
+            })
+        );
 
         return new SpongeSchematic(
-                metadata.build(), size, offset,
-                paletteBlocks, blockData,
-                List.of(), SpongeSchematic.EMPTY_BYTE_ARRAY,
-                blockEntities, List.of()
+            metadata.build(),
+            size,
+            offset,
+            paletteBlocks,
+            blockData,
+            List.of(),
+            SpongeSchematic.EMPTY_BYTE_ARRAY,
+            blockEntities,
+            List.of()
         );
     }
 }

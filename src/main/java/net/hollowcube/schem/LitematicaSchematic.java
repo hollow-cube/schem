@@ -13,15 +13,13 @@ import java.util.List;
 import java.util.Map;
 
 public record LitematicaSchematic(
-        CompoundBinaryTag metadata,
-        Point size,
-        Map<String, Schematic> regions
+    CompoundBinaryTag metadata,
+    Point size,
+    Map<String, Schematic> regions
 ) implements Schematic {
 
     @Override
-    public void forEachBlock(Rotation rotation, BlockConsumer consumer) {
-
-    }
+    public void forEachBlock(Rotation rotation, BlockConsumer consumer) {}
 
     @Override
     public @Nullable String name() {
@@ -65,16 +63,14 @@ public record LitematicaSchematic(
     @Override
     public List<BlockEntityData> blockEntities() {
         var allBlockEntites = new ArrayList<BlockEntityData>();
-        for (var region : regions.values())
-            allBlockEntites.addAll(region.blockEntities());
+        for (var region : regions.values()) allBlockEntites.addAll(region.blockEntities());
         return allBlockEntites;
     }
 
     @Override
     public List<CompoundBinaryTag> entities() {
         var allEntities = new ArrayList<CompoundBinaryTag>();
-        for (var region : regions.values())
-            allEntities.addAll(region.entities());
+        for (var region : regions.values()) allEntities.addAll(region.entities());
         return allEntities;
     }
 }

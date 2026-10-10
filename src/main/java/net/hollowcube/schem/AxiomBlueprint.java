@@ -12,27 +12,24 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public record AxiomBlueprint(
-        CompoundBinaryTag header,
-        ByteArrayBinaryTag thumbnail,
-        Point size,
-        List<Block> palette,
-        List<SectionData> sections
+    CompoundBinaryTag header,
+    ByteArrayBinaryTag thumbnail,
+    Point size,
+    List<Block> palette,
+    List<SectionData> sections
 ) implements Schematic {
     public static final int MAGIC_NUMBER = 0xAE5BB36;
     public static final int BLOCK_PALETTE_SIZE = 4096;
 
     public record SectionData(
-            Point chunkPos,
-            List<Block> palette,
-            // Null means all one palette
-            @Nullable IntArrayBinaryTag blockData
-    ) {
-    }
+        Point chunkPos,
+        List<Block> palette,
+        // Null means all one palette
+        @Nullable IntArrayBinaryTag blockData
+    ) {}
 
     @Override
-    public void forEachBlock(Rotation rotation, BlockConsumer consumer) {
-
-    }
+    public void forEachBlock(Rotation rotation, BlockConsumer consumer) {}
 
     @Override
     public CompoundBinaryTag metadata() {

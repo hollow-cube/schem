@@ -15,10 +15,15 @@ final class ReadHelpers {
         throw new SchematicReadException(MessageFormat.format(message, args));
     }
 
-    public static <T extends BinaryTag> T getRequired(CompoundBinaryTag tag, String key, BinaryTagType<T> type) {
+    public static <T extends BinaryTag> T getRequired(
+        CompoundBinaryTag tag,
+        String key,
+        BinaryTagType<T> type
+    ) {
         var value = tag.get(key);
         if (value == null) throw new SchematicReadException("missing required field '" + key + "'");
-        if (value.type() != type) throw new SchematicReadException("expected field '" + key + "' to be a " + type);
+        if (value.type() != type)
+            throw new SchematicReadException("expected field '" + key + "' to be a " + type);
         //noinspection unchecked
         return (T) value;
     }
@@ -48,7 +53,10 @@ final class ReadHelpers {
         if (propsTag.size() == 0) return block;
         var properties = new HashMap<String, String>();
         for (var entry : propsTag) {
-            assertTrue(entry.getValue().type() == BinaryTagTypes.STRING, "expected property value to be a string");
+            assertTrue(
+                entry.getValue().type() == BinaryTagTypes.STRING,
+                "expected property value to be a string"
+            );
             properties.put(entry.getKey(), ((StringBinaryTag) entry.getValue()).value());
         }
         try {
@@ -87,7 +95,8 @@ final class ReadHelpers {
             if (startArrIndex == endArrIndex) {
                 out[i] = (int) (in[startArrIndex] >>> subIndex & maxEntryValue);
             } else {
-                out[i] = (int) ((in[startArrIndex] >>> subIndex | in[endArrIndex] << (64 - subIndex)) & maxEntryValue);
+                long spanning = in[startArrIndex] >>> subIndex | in[endArrIndex] << (64 - subIndex);
+                out[i] = (int) (spanning & maxEntryValue);
             }
         }
     }
@@ -104,7 +113,7 @@ final class ReadHelpers {
         public int next() {
             // https://github.com/jvm-profiling-tools/async-profiler/blob/a38a375dc62b31a8109f3af97366a307abb0fe6f/src/converter/one/jfr/JfrReader.java#L393
             int result = 0;
-            for (int shift = 0; ; shift += 7) {
+            for (int shift = 0;; shift += 7) {
                 byte b = data.get(index++);
                 result |= (b & 0x7f) << shift;
                 if (b >= 0) {
@@ -114,6 +123,5 @@ final class ReadHelpers {
         }
     }
 
-    private ReadHelpers() {
-    }
+    private ReadHelpers() {}
 }

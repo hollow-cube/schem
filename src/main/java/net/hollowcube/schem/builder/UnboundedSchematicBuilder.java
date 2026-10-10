@@ -78,7 +78,6 @@ public class UnboundedSchematicBuilder implements SchematicBuilder {
         // so each block is one byte. If the palette is larger, we will resize
         var blockBytes = ByteBuffer.allocate(blockCount + 4);
         for (int i = 0; i < blockCount; i++) {
-
             // Resize array if it is too small
             if (blockBytes.remaining() <= 3) {
                 byte[] oldBytes = blockBytes.array();
@@ -93,11 +92,7 @@ public class UnboundedSchematicBuilder implements SchematicBuilder {
             int x = remainder - z * width;
 
             // Write the block in XZY order
-            var blockPos = new Vec(x, y, z
-//                    (int) (i % size.blockX()),
-//                    (int) (i / (size.blockX() * size.blockZ())),
-//                    (int) ((i / size.blockX()) % size.blockZ())
-            ).add(min);
+            var blockPos = new Vec(x, y, z).add(min);
             var block = blockSet.get(blockPos);
 
             if (block == null) {
@@ -120,8 +115,14 @@ public class UnboundedSchematicBuilder implements SchematicBuilder {
             var blockHandler = block.handler();
             if (blockHandler != null) {
                 var blockEntityId = blockHandler.getKey().asString();
-                var blockEntityData = Objects.requireNonNullElse(block.nbt(), CompoundBinaryTag.empty());
-                blockEntities.put(blockIndex(size, x, y, z), new BlockEntityData(blockEntityId, new Vec(x, y, z), blockEntityData));
+                var blockEntityData = Objects.requireNonNullElse(
+                    block.nbt(),
+                    CompoundBinaryTag.empty()
+                );
+                blockEntities.put(
+                    blockIndex(size, x, y, z),
+                    new BlockEntityData(blockEntityId, new Vec(x, y, z), blockEntityData)
+                );
             }
         }
 
@@ -134,10 +135,15 @@ public class UnboundedSchematicBuilder implements SchematicBuilder {
         blockBytes.flip().get(out);
 
         return new SpongeSchematic(
-                metadata.build(), size, offset,
-                List.of(palette), ByteArrayBinaryTag.byteArrayBinaryTag(out),
-                List.of(), SpongeSchematic.EMPTY_BYTE_ARRAY,
-                blockEntities, List.of()
+            metadata.build(),
+            size,
+            offset,
+            List.of(palette),
+            ByteArrayBinaryTag.byteArrayBinaryTag(out),
+            List.of(),
+            SpongeSchematic.EMPTY_BYTE_ARRAY,
+            blockEntities,
+            List.of()
         );
     }
 
@@ -151,11 +157,19 @@ public class UnboundedSchematicBuilder implements SchematicBuilder {
             buf.put((byte) ((value >>> 7) & 0x7F | 0x80));
             buf.put((byte) (value >>> 14));
         } else if ((value & (0xFFFFFFFF << 28)) == 0) {
-            buf.putInt((value & 0x7F | 0x80) << 24 | (((value >>> 7) & 0x7F | 0x80) << 16)
-                    | ((value >>> 14) & 0x7F | 0x80) << 8 | (value >>> 21));
+            buf.putInt(
+                (value & 0x7F | 0x80) << 24
+                    | (((value >>> 7) & 0x7F | 0x80) << 16)
+                    | ((value >>> 14) & 0x7F | 0x80) << 8
+                    | (value >>> 21)
+            );
         } else {
-            buf.putInt((value & 0x7F | 0x80) << 24 | ((value >>> 7) & 0x7F | 0x80) << 16
-                    | ((value >>> 14) & 0x7F | 0x80) << 8 | ((value >>> 21) & 0x7F | 0x80));
+            buf.putInt(
+                (value & 0x7F | 0x80) << 24
+                    | ((value >>> 7) & 0x7F | 0x80) << 16
+                    | ((value >>> 14) & 0x7F | 0x80) << 8
+                    | ((value >>> 21) & 0x7F | 0x80)
+            );
             buf.put((byte) (value >>> 28));
         }
     }

@@ -50,6 +50,5 @@ final class WriteHelpers {
     // https://github.com/maruohon/litematica/blob/pre-rewrite/fabric/1.20.x/src/main/java/fi/dy/masa/litematica/schematic/container/LitematicaBitArray.java#L44
     //todo packTight
 
-    private WriteHelpers() {
-    }
+    private WriteHelpers() {}
 }

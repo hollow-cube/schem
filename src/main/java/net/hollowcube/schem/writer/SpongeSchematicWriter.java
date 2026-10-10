@@ -25,7 +25,11 @@ final class SpongeSchematicWriter implements SchematicWriter {
     public byte[] write(Schematic schematic) {
         try {
             var out = new ByteArrayOutputStream();
-            BinaryTagIO.writer().writeNamed(Map.entry("", createRoot(schematic)), out, BinaryTagIO.Compression.GZIP);
+            BinaryTagIO.writer().writeNamed(
+                Map.entry("", createRoot(schematic)),
+                out,
+                BinaryTagIO.Compression.GZIP
+            );
             return out.toByteArray();
         } catch (IOException e) {
             throw new SchematicWriteException("failed to write schematic", e);
@@ -44,7 +48,7 @@ final class SpongeSchematicWriter implements SchematicWriter {
         root.putShort("Length", (short) size.blockZ());
 
         var offset = schematic.offset();
-        root.putIntArray("Offset", new int[]{offset.blockX(), offset.blockY(), offset.blockZ()});
+        root.putIntArray("Offset", new int[] {offset.blockX(), offset.blockY(), offset.blockZ()});
 
         if (schematic.hasBlockData()) {
             root.put("Blocks", createBlockContainer(schematic));
@@ -66,19 +70,20 @@ final class SpongeSchematicWriter implements SchematicWriter {
 
         var palette = schematic.blockPalette();
         var paletteTag = CompoundBinaryTag.builder();
-        for (int i = 0; i < palette.size(); i++)
-            paletteTag.putInt(palette.get(i).state(), i);
+        for (int i = 0; i < palette.size(); i++) paletteTag.putInt(palette.get(i).state(), i);
         container.put("Palette", paletteTag.build());
         container.put("Data", schematic.blockData());
 
         var blockEntityList = ListBinaryTag.builder(BinaryTagTypes.COMPOUND);
         for (var blockEntity : schematic.blockEntities()) {
             var pos = blockEntity.position();
-            blockEntityList.add(CompoundBinaryTag.builder()
+            blockEntityList.add(
+                CompoundBinaryTag.builder()
                     .putString("Id", blockEntity.id())
-                    .putIntArray("Pos", new int[]{pos.blockX(), pos.blockY(), pos.blockZ()})
+                    .putIntArray("Pos", new int[] {pos.blockX(), pos.blockY(), pos.blockZ()})
                     .put("Data", blockEntity.data())
-                    .build());
+                    .build()
+            );
         }
         // Note: we must include block entities or WorldEdit fails to read the schematic. Thank you worldedit!
         container.put("BlockEntities", blockEntityList.build());
@@ -90,8 +95,7 @@ final class SpongeSchematicWriter implements SchematicWriter {
         var container = CompoundBinaryTag.builder();
         var palette = schematic.biomePalette();
         var paletteTag = CompoundBinaryTag.builder();
-        for (int i = 0; i < palette.size(); i++)
-            paletteTag.putInt(palette.get(i), i);
+        for (int i = 0; i < palette.size(); i++) paletteTag.putInt(palette.get(i), i);
         container.put("Palette", paletteTag.build());
         container.put("Data", schematic.biomeData());
         return container.build();

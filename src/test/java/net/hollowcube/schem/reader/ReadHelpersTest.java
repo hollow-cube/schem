@@ -13,23 +13,26 @@ class ReadHelpersTest {
     @Test
     void readsLegacyFieldNames() {
         var tag = CompoundBinaryTag.builder()
-                .putString("Name", "minecraft:oak_log")
-                .put("Properties", CompoundBinaryTag.builder().putString("axis", "x").build())
-                .build();
+            .putString("Name", "minecraft:oak_log")
+            .put("Properties", CompoundBinaryTag.builder().putString("axis", "x").build())
+            .build();
         assertEquals(OAK_LOG_X, ReadHelpers.readBlockState(tag));
     }
 
     @Test
     void readsRenamedFieldNames() {
         var tag = CompoundBinaryTag.builder()
-                .putString("id", "minecraft:oak_log")
-                .put("properties", CompoundBinaryTag.builder().putString("axis", "x").build())
-                .build();
+            .putString("id", "minecraft:oak_log")
+            .put("properties", CompoundBinaryTag.builder().putString("axis", "x").build())
+            .build();
         assertEquals(OAK_LOG_X, ReadHelpers.readBlockState(tag));
     }
 
     @Test
     void missingNameFails() {
-        assertThrows(SchematicReadException.class, () -> ReadHelpers.readBlockState(CompoundBinaryTag.empty()));
+        assertThrows(
+            SchematicReadException.class,
+            () -> ReadHelpers.readBlockState(CompoundBinaryTag.empty())
+        );
     }
 }

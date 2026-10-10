@@ -23,8 +23,8 @@ final class DetectingSchematicReader implements SchematicReader {
 
         // All other options are an NBT compound at the root.
         final Map.Entry<String, CompoundBinaryTag> rootPair = BinaryTagIO.reader().readNamed(
-                new ByteArrayInputStream(data),
-                BinaryTagIO.Compression.GZIP
+            new ByteArrayInputStream(data),
+            BinaryTagIO.Compression.GZIP
         );
 
         final Set<String> keys = rootPair.getValue().keySet();
@@ -44,7 +44,10 @@ final class DetectingSchematicReader implements SchematicReader {
             }
             case "Schematic" -> {
                 // Schematic as the root key can be Sponge V1, V2 or an MCEdit schematic.
-                if (keys.contains("Materials") || keys.contains("Platform") || keys.contains("Blocks") || keys.contains("Data")) {
+                if (keys.contains("Materials")
+                    || keys.contains("Platform")
+                    || keys.contains("Blocks")
+                    || keys.contains("Data")) {
                     // Any of these indicate an MCEdit schematic
                     yield new MCEditSchematicReader().read(rootPair);
                 }

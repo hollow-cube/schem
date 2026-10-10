@@ -35,10 +35,12 @@ final class SpongeSchematicReader implements SchematicReader {
     @Override
     public Schematic read(byte[] data) throws SchematicReadException {
         try {
-            return read(BinaryTagIO.reader().readNamed(
+            return read(
+                BinaryTagIO.reader().readNamed(
                     new ByteArrayInputStream(data),
                     BinaryTagIO.Compression.GZIP
-            ));
+                )
+            );
         } catch (IOException e) {
             throw new SchematicReadException("failed to read root compound", e);
         }
@@ -51,13 +53,20 @@ final class SpongeSchematicReader implements SchematicReader {
             root = getRequired(root, "Schematic", BinaryTagTypes.COMPOUND);
         } else {
             // V1,2 should have the root tag as "Schematic"
-            assertTrue("Schematic".equals(rootPair.getKey()), "missing required root tag 'Schematic'");
+            assertTrue(
+                "Schematic".equals(rootPair.getKey()),
+                "missing required root tag 'Schematic'"
+            );
         }
 
         int version = root.getInt("Version");
-        if (version == 0) version = 1; // Version 0 is not a valid version, but it is used in some old schematics
-        assertTrue(version >= MIN_VERSION && version <= MAX_VERSION,
-                "unsupported schematic version {0}", version);
+        // Version 0 is not a valid version, but it is used in some old schematics
+        if (version == 0) version = 1;
+        assertTrue(
+            version >= MIN_VERSION && version <= MAX_VERSION,
+            "unsupported schematic version {0}",
+            version
+        );
         int dataVersion = root.getInt("DataVersion");
         assertTrue(dataVersion >= 0, "invalid data version {0}", dataVersion);
         int dataVersionMax = gameData.dataVersion();
@@ -94,14 +103,22 @@ final class SpongeSchematicReader implements SchematicReader {
             // if not present. However, this is not currently implemented as there is no way to support upgrading
             // the block ids currently.
             var blockPaletteObject = getRequired(root, "Palette", BinaryTagTypes.COMPOUND);
-            blockPalette = new Block[blockPaletteMax < 1 ? blockPaletteObject.size() : blockPaletteMax];
+            var paletteSize = blockPaletteMax < 1 ? blockPaletteObject.size() : blockPaletteMax;
+            blockPalette = new Block[paletteSize];
             for (var entry : blockPaletteObject) {
-                assertTrue(entry.getValue().type() == BinaryTagTypes.INT, "expected palette entry to be an int");
+                assertTrue(
+                    entry.getValue().type() == BinaryTagTypes.INT,
+                    "expected palette entry to be an int"
+                );
                 var paletteId = ((IntBinaryTag) entry.getValue()).value();
                 try {
                     String blockState = entry.getKey();
                     if (dataVersion < dataVersionMax)
-                        blockState = gameData.upgradeBlockState(dataVersion, dataVersionMax, blockState);
+                        blockState = gameData.upgradeBlockState(
+                            dataVersion,
+                            dataVersionMax,
+                            blockState
+                        );
                     blockPalette[paletteId] = ArgumentBlockState.staticParse(blockState);
                 } catch (ArgumentSyntaxException e) {
                     throw new IllegalStateException("invalid block type: " + entry.getKey(), e);
@@ -110,7 +127,10 @@ final class SpongeSchematicReader implements SchematicReader {
             blockData = getRequired(root, "BlockData", BinaryTagTypes.BYTE_ARRAY).value();
 
             // === Block entities ===
-            var tileEntities = root.getList(version == 1 ? "TileEntities" : "BlockEntities", BinaryTagTypes.COMPOUND);
+            var tileEntities = root.getList(
+                version == 1 ? "TileEntities" : "BlockEntities",
+                BinaryTagTypes.COMPOUND
+            );
             for (var tileEntity : tileEntities) {
                 var data = (CompoundBinaryTag) tileEntity;
                 var id = getRequired(data, "Id", BinaryTagTypes.STRING);
@@ -121,25 +141,45 @@ final class SpongeSchematicReader implements SchematicReader {
                 var extracted = CompoundBinaryTag.builder();
                 for (var entry : data) {
                     var key = entry.getKey();
-                    if ("Id".equals(key) || "Pos".equals(key) || "ContentVersion".equals(key)) continue;
+                    if ("Id".equals(key) || "Pos".equals(key) || "ContentVersion".equals(key))
+                        continue;
                     extracted.put(entry.getKey(), entry.getValue());
                 }
 
                 var blockEntityData = extracted.build();
                 if (dataVersion < dataVersionMax)
-                    blockEntityData = gameData.upgradeBlockEntity(dataVersion, dataVersionMax, id.value(), blockEntityData);
-                blockEntities.put(blockIndex(size, pos), new BlockEntityData(id.value(), pos, blockEntityData));
+                    blockEntityData = gameData.upgradeBlockEntity(
+                        dataVersion,
+                        dataVersionMax,
+                        id.value(),
+                        blockEntityData
+                    );
+                blockEntities.put(
+                    blockIndex(size, pos),
+                    new BlockEntityData(id.value(), pos, blockEntityData)
+                );
             }
         } else {
             var blocksContainer = root.getCompound("Blocks");
-            var blockPaletteObject = getRequired(blocksContainer, "Palette", BinaryTagTypes.COMPOUND);
+            var blockPaletteObject = getRequired(
+                blocksContainer,
+                "Palette",
+                BinaryTagTypes.COMPOUND
+            );
             blockPalette = new Block[blockPaletteObject.size()];
             for (var entry : blockPaletteObject) {
-                assertTrue(entry.getValue().type() == BinaryTagTypes.INT, "expected palette entry to be an int");
+                assertTrue(
+                    entry.getValue().type() == BinaryTagTypes.INT,
+                    "expected palette entry to be an int"
+                );
                 var paletteId = ((IntBinaryTag) entry.getValue()).value();
                 var blockState = entry.getKey();
                 if (dataVersion < dataVersionMax)
-                    blockState = gameData.upgradeBlockState(dataVersion, dataVersionMax, blockState);
+                    blockState = gameData.upgradeBlockState(
+                        dataVersion,
+                        dataVersionMax,
+                        blockState
+                    );
                 var block = ArgumentBlockState.staticParse(blockState);
 
                 // Increase the palette size if the input object has missing indices (dumb)
@@ -157,14 +197,23 @@ final class SpongeSchematicReader implements SchematicReader {
             blockData = getRequired(blocksContainer, "Data", BinaryTagTypes.BYTE_ARRAY).value();
 
             // === Block entities ===
-            for (var blockEntityTag : blocksContainer.getList("BlockEntities", BinaryTagTypes.COMPOUND)) {
+            var blockEntityTags = blocksContainer.getList("BlockEntities", BinaryTagTypes.COMPOUND);
+            for (var blockEntityTag : blockEntityTags) {
                 var blockEntity = (CompoundBinaryTag) blockEntityTag;
                 var id = getRequired(blockEntity, "Id", BinaryTagTypes.STRING);
                 var pos = getRequiredPoint(blockEntity, "Pos");
                 var data = blockEntity.getCompound("Data");
                 if (dataVersion < gameData.dataVersion())
-                    data = gameData.upgradeBlockEntity(dataVersion, gameData.dataVersion(), id.value(), data);
-                blockEntities.put(blockIndex(size, pos), new BlockEntityData(id.value(), pos, data));
+                    data = gameData.upgradeBlockEntity(
+                        dataVersion,
+                        gameData.dataVersion(),
+                        id.value(),
+                        data
+                    );
+                blockEntities.put(
+                    blockIndex(size, pos),
+                    new BlockEntityData(id.value(), pos, data)
+                );
             }
         }
 
@@ -174,7 +223,8 @@ final class SpongeSchematicReader implements SchematicReader {
         if (version == 2) {
             var biomePaletteMax = root.getInt("BiomePaletteMax", -1);
             var biomePaletteObject = root.getCompound("BiomePalette");
-            biomePalette = new String[biomePaletteMax < 1 ? biomePaletteObject.size() : biomePaletteMax];
+            var paletteSize = biomePaletteMax < 1 ? biomePaletteObject.size() : biomePaletteMax;
+            biomePalette = new String[paletteSize];
             for (var entry : biomePaletteObject) {
                 var paletteId = ((IntBinaryTag) entry.getValue()).value();
                 biomePalette[paletteId] = entry.getKey();
@@ -204,10 +254,15 @@ final class SpongeSchematicReader implements SchematicReader {
         }
 
         return new SpongeSchematic(
-                metadata, size, offset,
-                List.of(blockPalette), ByteArrayBinaryTag.byteArrayBinaryTag(blockData),
-                List.of(biomePalette), ByteArrayBinaryTag.byteArrayBinaryTag(biomeData),
-                blockEntities, entities
+            metadata,
+            size,
+            offset,
+            List.of(blockPalette),
+            ByteArrayBinaryTag.byteArrayBinaryTag(blockData),
+            List.of(biomePalette),
+            ByteArrayBinaryTag.byteArrayBinaryTag(biomeData),
+            blockEntities,
+            entities
         );
     }
 

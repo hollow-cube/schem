@@ -10,6 +10,7 @@ junit-platform = "6.1.3"
 logback = "1.6.5" # For tests only
 
 nmcp = "1.6.2"
+javafmt = "0.3.1"
 
 [libraries]
 minestom = { group = "net.minestom", name = "minestom", version.ref = "minestom" }
@@ -27,3 +28,4 @@ logback = ["logback-core", "logback-classic"]
 [plugins]
 nmcp = { id = "com.gradleup.nmcp", version.ref = "nmcp" }
 nmcp-aggregation = { id = "com.gradleup.nmcp.aggregation", version.ref = "nmcp" }
+javafmt = { id = "dev.javafmt.gradle", version.ref = "javafmt" }

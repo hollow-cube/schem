@@ -23,23 +23,28 @@ import static net.hollowcube.schem.util.CoordinateUtil.blockIndex;
 
 @SuppressWarnings("UnstableApiUsage")
 public record SpongeSchematic(
-        CompoundBinaryTag metadata,
-        Point size,
-        Point offset,
-        List<Block> blockPalette,
-        ByteArrayBinaryTag blockData,
-        List<String> biomePalette,
-        ByteArrayBinaryTag biomeData,
-        Int2ObjectMap<BlockEntityData> blockEntitiesByPos,
-        List<CompoundBinaryTag> entities
+    CompoundBinaryTag metadata,
+    Point size,
+    Point offset,
+    List<Block> blockPalette,
+    ByteArrayBinaryTag blockData,
+    List<String> biomePalette,
+    ByteArrayBinaryTag biomeData,
+    Int2ObjectMap<BlockEntityData> blockEntitiesByPos,
+    List<CompoundBinaryTag> entities
 ) implements Schematic {
 
     public static final ByteArrayBinaryTag EMPTY_BYTE_ARRAY = ByteArrayBinaryTag.byteArrayBinaryTag();
     public static final Schematic EMPTY = new SpongeSchematic(
-            CompoundBinaryTag.empty(), Vec.ZERO, Vec.ZERO,
-            List.of(), EMPTY_BYTE_ARRAY,
-            List.of(), EMPTY_BYTE_ARRAY,
-            Int2ObjectMaps.emptyMap(), List.of()
+        CompoundBinaryTag.empty(),
+        Vec.ZERO,
+        Vec.ZERO,
+        List.of(),
+        EMPTY_BYTE_ARRAY,
+        List.of(),
+        EMPTY_BYTE_ARRAY,
+        Int2ObjectMaps.emptyMap(),
+        List.of()
     );
 
     public SpongeSchematic {
@@ -62,12 +67,12 @@ public record SpongeSchematic(
                         // Lower case the IDs always to prevent parse errors, especially for legacy names like 'Beacon'
                         var lowerKey = blockEntity.id().toLowerCase(Locale.ROOT);
                         block = block.withHandler(BLOCK_MANAGER.getHandlerOrDummy(lowerKey))
-                                .withNbt(blockEntity.data());
+                            .withNbt(blockEntity.data());
                     }
 
                     consumer.accept(
-                            CoordinateUtil.rotatePos(offset.add(x, y, z), rotation),
-                            CoordinateUtil.rotateBlock(block, rotation)
+                        CoordinateUtil.rotatePos(offset.add(x, y, z), rotation),
+                        CoordinateUtil.rotateBlock(block, rotation)
                     );
                 }
             }

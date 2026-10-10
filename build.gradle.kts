@@ -5,6 +5,7 @@ plugins {
     signing
     alias(libs.plugins.nmcp)
     alias(libs.plugins.nmcp.aggregation)
+    alias(libs.plugins.javafmt)
 }
 
 group = "dev.hollowcube"

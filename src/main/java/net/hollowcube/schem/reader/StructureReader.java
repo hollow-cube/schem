@@ -23,10 +23,12 @@ final class StructureReader implements SchematicReader {
     @Override
     public Schematic read(byte[] data) throws SchematicReadException {
         try {
-            return read(BinaryTagIO.reader().readNamed(
+            return read(
+                BinaryTagIO.reader().readNamed(
                     new ByteArrayInputStream(data),
                     BinaryTagIO.Compression.GZIP
-            ));
+                )
+            );
         } catch (IOException e) {
             throw new SchematicReadException("failed to read root compound", e);
         }
@@ -35,12 +37,19 @@ final class StructureReader implements SchematicReader {
     public static Point getRequiredPoint(CompoundBinaryTag tag, String key) {
         var rawOffset = getRequired(tag, key, BinaryTagTypes.LIST);
         assertTrue(rawOffset.size() == 3, "invalid {0} size {1}", key, rawOffset.size());
-        assertTrue(rawOffset.elementType() == BinaryTagTypes.INT, "position list must contain ints");
+        assertTrue(
+            rawOffset.elementType() == BinaryTagTypes.INT,
+            "position list must contain ints"
+        );
         return new BlockVec(rawOffset.getInt(0), rawOffset.getInt(1), rawOffset.getInt(2));
     }
 
     public Schematic read(Map.Entry<String, CompoundBinaryTag> rootPair) {
-        assertTrue("".equals(rootPair.getKey()), "root tag must be empty, was: '{0}'", rootPair.getKey());
+        assertTrue(
+            "".equals(rootPair.getKey()),
+            "root tag must be empty, was: '{0}'",
+            rootPair.getKey()
+        );
         var root = rootPair.getValue();
         var dataVersion = getRequired(root, "DataVersion", BinaryTagTypes.INT);
 
