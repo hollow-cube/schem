@@ -47,7 +47,7 @@ public class DemoServer {
 
                 try (var is = getClass().getResourceAsStream("/" + String.join(" ", context.<String[]>get("path")) + ".schem")) {
                     var schem = SchematicReader.sponge().read(is.readAllBytes());
-                    schem.createBatch(Rotation.NONE).apply(instance, player.getPosition(), () -> {
+                    schem.createBatch(Rotation.NONE).apply(instance, player.getPosition(), _ -> {
                         player.sendMessage("Done!");
                     });
                 } catch (Exception e) {

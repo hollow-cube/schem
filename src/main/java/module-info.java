@@ -1,6 +1,6 @@
 module schem {
     requires net.minestom.server;
-    requires net.kyori.adventure;
+    requires net.kyori.adventure.api;
     requires net.kyori.adventure.nbt;
 
     requires org.jetbrains.annotations;

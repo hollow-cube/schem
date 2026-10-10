@@ -20,6 +20,7 @@ dependencies {
     testImplementation(libs.minestom)
     compileOnly(libs.fastutil)
     testImplementation(libs.fastutil)
+    compileOnly(libs.slf4j)
 
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform.launcher)
